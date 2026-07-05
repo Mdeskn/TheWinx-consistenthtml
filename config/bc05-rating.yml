@@ -1,0 +1,20 @@
+# Served by infra-config-server in Task 2 (overrides local application.yml values).
+spring:
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        slidingWindowSize: 10
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+        permittedNumberOfCallsInHalfOpenState: 3
+    instances:
+      booking:
+        baseConfig: default
+      fleet:
+        baseConfig: default

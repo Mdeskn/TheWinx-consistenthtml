@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Rating – Instant Mobility</title>
+    <link rel="stylesheet" href="http://localhost:8080/styles.css">
+</head>
+<body>
+<div class="container">
+
+    <div class="panel hero">
+        <div>
+            <p class="eyebrow">BC-05 Rating</p>
+            <h1>Submit a Rating</h1>
+            <p class="subtitle">Rate your vehicle and provider after a completed booking. Each booking can only be rated once.</p>
+        </div>
+        <div class="link-group">
+            <a class="link-button secondary-button" th:href="@{/ratings}">← All Ratings</a>
+        </div>
+    </div>
+
+    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+    <div class="panel">
+        <h2>Rating Details</h2>
+        <form th:action="@{/ratings/submit}" th:object="${form}" method="post" novalidate>
+
+            <div class="form-grid cols-4">
+                <label>
+                    Booking ID
+                    <input type="number" th:field="*{bookingId}" placeholder="e.g. 1001" required>
+                    <span class="error-msg"
+                          th:if="${#fields.hasErrors('bookingId')}"
+                          th:errors="*{bookingId}"></span>
+                </label>
+                <label>
+                    User ID
+                    <input type="number" th:field="*{userId}" placeholder="e.g. 1" required>
+                </label>
+                <label>
+                    Vehicle ID
+                    <input type="number" th:field="*{vehicleId}" placeholder="e.g. 10" required>
+                </label>
+                <label>
+                    Provider ID
+                    <input type="number" th:field="*{providerId}" placeholder="e.g. 100" required>
+                </label>
+            </div>
+
+            <div class="form-grid">
+                <label>
+                    Vehicle Score (1–5)
+                    <input type="number" th:field="*{vehicleScore}" min="1" max="5" required>
+                    <span class="error-msg"
+                          th:if="${#fields.hasErrors('vehicleScore')}"
+                          th:errors="*{vehicleScore}"></span>
+                </label>
+                <label>
+                    Provider Score (1–5)
+                    <input type="number" th:field="*{providerScore}" min="1" max="5" required>
+                    <span class="error-msg"
+                          th:if="${#fields.hasErrors('providerScore')}"
+                          th:errors="*{providerScore}"></span>
+                </label>
+            </div>
+
+            <label style="width: 100%;">
+                Comment <span style="color: #aab; font-weight: 400;">(optional)</span>
+                <textarea th:field="*{comment}" placeholder="Share your experience..."></textarea>
+            </label>
+
+            <div style="width: 100%; display: flex; gap: 0.65rem; margin-top: 0.4rem;">
+                <button type="submit">Submit Rating</button>
+                <a class="link-button secondary-button" th:href="@{/ratings}">Cancel</a>
+            </div>
+
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

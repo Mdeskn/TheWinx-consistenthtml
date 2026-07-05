@@ -1,0 +1,13 @@
+# Per-service config served by infra-config-server (Task 2).
+# In Task 2 the resilience4j circuit-breaker instances (identity/fleet/payment)
+# move here from the service's local application.yml.
+resilience4j:
+  circuitbreaker:
+    instances:
+      identity:
+        baseConfig: default
+      fleet:
+        baseConfig: default
+      payment:
+        baseConfig: default
+        waitDurationInOpenState: 15s

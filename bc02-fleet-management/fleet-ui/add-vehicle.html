@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Vehicle</title>
+    <script src="api.js"></script>
+</head>
+<body>
+    <h2>Add Vehicle</h2>
+
+    <input id="type" placeholder="Vehicle Type"><br>
+    <input id="status" placeholder="Status"><br>
+    <input id="lat" placeholder="Latitude"><br>
+    <input id="lon" placeholder="Longitude"><br>
+
+    <button onclick="addVehicle()">Add</button>
+
+    <script>
+        async function addVehicle() {
+            const vehicle = {
+                type: document.getElementById("type").value,
+                status: document.getElementById("status").value,
+                latitude: document.getElementById("lat").value,
+                longitude: document.getElementById("lon").value
+            };
+
+            const result = await createVehicle(vehicle);
+            alert("Vehicle added: " + JSON.stringify(result));
+        }
+    </script>
+</body>
+</html>

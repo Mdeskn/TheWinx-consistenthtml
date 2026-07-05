@@ -1,0 +1,25 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: infra-config-server
+  profiles:
+    active: native
+  cloud:
+    config:
+      server:
+        native:
+          # The canonical config lives in the repo-root `config/` folder.
+          # Both paths are listed so the server resolves it whether it is started
+          # from the repo root (file:./config) or from this module dir
+          # (file:../config, which is how `mvnw -pl infra-config-server spring-boot:run` runs).
+          search-locations: file:./config,file:../config
+
+# Registering with Eureka is optional for the lab; harmless when Eureka is down.
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true

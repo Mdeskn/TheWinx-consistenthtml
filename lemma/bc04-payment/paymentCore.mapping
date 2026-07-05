@@ -1,0 +1,152 @@
+import microservices from "paymentCore.services" as paymentCoreServices
+import technology from "../technology/javaWithSpring.technology" as java
+import technology from "../technology/map.technology" as map
+
+@technology(java)
+type paymentCoreServices::domain::paymentCore.Payment {
+    aspects {
+        java::_aspects.Table("payments");
+    }
+
+    paymentId {
+        aspects {
+            java::_aspects.GeneratedValue;
+        }
+    }
+
+    paymentMethod {
+        aspects {
+            java::_aspects.Enumerated("STRING");
+        }
+    }
+
+    status {
+        aspects {
+            java::_aspects.Enumerated("STRING");
+        }
+    }
+}
+
+@technology(java)
+@technology(map)
+type paymentCoreServices::domain::paymentCore.PaymentRequest {
+    aspects {
+        map::_aspects.AtomicParameterList;
+    }
+}
+
+@technology(java)
+type paymentCoreServices::domain::paymentCore.PaymentRepository {
+}
+
+@technology(java)
+type paymentCoreServices::domain::paymentCore.PaymentService {
+}
+
+@technology(java)
+@technology(map)
+paymentCoreServices::com.winx.payment.PaymentCore {
+    aspects {
+        java::_aspects.ApplicationName("bc04-payment");
+
+        java::_aspects.JacksonConfiguration(
+            INDENT_OUTPUT=true,
+            defaultPropertyInclusion="NON_NULL"
+        );
+
+        java::_aspects.DatasourceConfiguration(
+            url="jdbc:h2:mem:paymentdb",
+            username="sa",
+            password="",
+            driverClassName="org.h2.Driver"
+        );
+
+        java::_aspects.HibernateConfiguration("update");
+
+        java::_aspects.Port(8084);
+    }
+
+    interface paymentInformationHolder {
+        endpoints {
+            java::_protocols.rest: "/api/payments";
+        }
+
+        aspects {
+            map::_aspects.InformationHolderResource;
+        }
+    }
+
+    operation paymentInformationHolder.createPayment {
+        aspects {
+            java::_aspects.PostMapping;
+        }
+
+        parameters {
+            complex requestDto {
+                aspects {
+                    java::_aspects.RequestBody;
+                }
+            }
+
+            complex responseDto : java::_types.ResponseEntity;
+        }
+    }
+
+    operation paymentInformationHolder.getPayments {
+        aspects {
+            java::_aspects.GetMapping;
+        }
+    }
+
+    operation paymentInformationHolder.getPaymentById {
+        endpoints {
+            java::_protocols.rest: "/{paymentId}";
+        }
+
+        aspects {
+            java::_aspects.GetMapping;
+        }
+
+        parameters {
+            primitive paymentId {
+                aspects {
+                    java::_aspects.PathVariable;
+                }
+            }
+
+            complex responseDto : java::_types.ResponseEntity;
+
+            primitive paymentNotFound {
+                aspects {
+                    java::_aspects.ResponseStatus("NOT_FOUND");
+                }
+            }
+        }
+    }
+
+    operation paymentInformationHolder.getPaymentByBookingId {
+        endpoints {
+            java::_protocols.rest: "/booking/{bookingId}";
+        }
+
+        aspects {
+            java::_aspects.GetMapping;
+        }
+
+        parameters {
+            primitive bookingId {
+                aspects {
+                    java::_aspects.PathVariable;
+                }
+            }
+
+            complex responseDto : java::_types.ResponseEntity;
+
+            primitive paymentNotFound {
+                aspects {
+                    java::_aspects.ResponseStatus("NOT_FOUND");
+                }
+            }
+        }
+    }
+}

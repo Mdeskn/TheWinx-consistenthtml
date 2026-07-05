@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Vehicle</title>
+    <script src="api.js"></script>
+</head>
+<body>
+    <h2>Update Vehicle</h2>
+
+    <input id="id" placeholder="Vehicle ID"><br>
+    <input id="status" placeholder="New Status"><br>
+    <input id="lat" placeholder="New Latitude"><br>
+    <input id="lon" placeholder="New Longitude"><br>
+
+    <button onclick="update()">Update</button>
+
+    <script>
+        async function update() {
+            const id = document.getElementById("id").value;
+
+            if (document.getElementById("status").value) {
+                await updateStatus(id, document.getElementById("status").value);
+            }
+
+            if (document.getElementById("lat").value && document.getElementById("lon").value) {
+                await updateLocation(id,
+                    document.getElementById("lat").value,
+                    document.getElementById("lon").value
+                );
+            }
+
+            alert("Vehicle updated");
+        }
+    </script>
+</body>
+</html>

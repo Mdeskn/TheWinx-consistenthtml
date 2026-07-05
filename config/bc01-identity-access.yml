@@ -1,0 +1,12 @@
+# Per-service config served by infra-config-server (Task 2).
+# Move behavioural overrides here as bc01-identity-access grows; the local
+# application.yml keeps only server port + datasource.
+resilience4j:
+  circuitbreaker:
+    instances:
+      bc02-fleet:
+        baseConfig: default
+      bc03-booking:
+        baseConfig: default
+      bc04-payment:
+        baseConfig: default

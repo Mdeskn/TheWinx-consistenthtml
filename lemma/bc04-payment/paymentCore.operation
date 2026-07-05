@@ -1,0 +1,43 @@
+import microservices from "paymentCore.services" as paymentCoreServices
+import technology from "../technology/deployment_base.technology" as deploymentBase
+import technology from "../technology/javaWithSpring.technology" as protocolTechnology
+import nodes from "../eureka-server/eurekaServer.operation" as eureka
+
+@technology(deploymentBase)
+@technology(protocolTechnology)
+container PaymentCoreContainer deployment technology deploymentBase::_deployment.Kubernetes
+    deploys paymentCoreServices::com.winx.payment.PaymentCore
+    depends on nodes eureka::ServiceDiscovery {
+    paymentCoreServices::com.winx.payment.PaymentCore {
+        Dockerfile = '
+            FROM eclipse-temurin:17-jre
+            COPY target/bc04-payment.jar app.jar
+            EXPOSE 8084
+            ENTRYPOINT ["java", "-jar", "app.jar"]
+'
+
+        ComposePart = '
+            bc04-payment:
+                build: ./bc04-payment
+                image: thewinx/bc04-payment
+                depends_on:
+                  - eureka-server
+                environment:
+                  - "SPRING_APPLICATION_NAME=bc04-payment"
+                  - "SERVER_PORT=8084"
+                  - "EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka"
+                ports:
+                  - "8084:8084"
+'
+
+        springApplicationName = "bc04-payment"
+        serverPort = 8084
+        eurekaUri = "http://localhost:8761"
+
+        basic endpoints {
+            protocolTechnology::_protocols.rest: "http://localhost:8084";
+            protocolTechnology::_protocols.soap: "http://localhost:8084";
+            protocolTechnology::_protocols.amqp: "amqp://localhost:5672";
+        }
+    }
+}

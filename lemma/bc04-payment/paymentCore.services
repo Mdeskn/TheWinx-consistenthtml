@@ -1,0 +1,44 @@
+import datatypes from "paymentCore.data" as domain
+
+public functional microservice com.winx.payment.PaymentCore {
+    interface paymentInformationHolder {
+        ---
+        Create and process a payment after a booking has been completed.
+
+        @required requestDto the payment request sent by the Booking microservice
+        ---
+        createPayment(
+            sync requestDto : domain::paymentCore.PaymentRequest,
+            sync out responseDto : domain::paymentCore.Payment
+        );
+
+        ---
+        Get all payments stored by the Payment microservice.
+        ---
+        getPayments(
+            sync out responseDto : domain::paymentCore.Payments
+        );
+
+        ---
+        Get a payment by its payment id.
+
+        @required paymentId the unique id of the payment
+        ---
+        getPaymentById(
+            sync paymentId : long,
+            sync out responseDto : domain::paymentCore.Payment,
+            sync out fault paymentNotFound : string
+        );
+
+        ---
+        Get a payment by its related booking id.
+
+        @required bookingId the booking reference from the Booking bounded context
+        ---
+        getPaymentByBookingId(
+            sync bookingId : long,
+            sync out responseDto : domain::paymentCore.Payment,
+            sync out fault paymentNotFound : string
+        );
+    }
+}

@@ -1,0 +1,78 @@
+import datatypes from "ratingCore.data" as domain
+
+public functional microservice com.winx.rating.RatingCore {
+    interface ratingSubmission {
+        ---
+        Submit a rating for a completed booking. Each booking can only be rated once.
+
+        @required requestDto the rating data including bookingId, scores and optional comment
+        ---
+        submitRating(
+            sync requestDto : domain::ratingCore.SubmitRatingRequest,
+            sync out responseDto : domain::ratingCore.RatingResponse,
+            sync out fault duplicateRating : string,
+            sync out fault bookingNotCompleted : string
+        );
+    }
+
+    interface ratingQuery {
+        ---
+        Get all ratings stored in the system.
+        ---
+        getAllRatings(
+            sync out ratings : domain::ratingCore.RatingResponses
+        );
+
+        ---
+        Get a single rating by its ID.
+
+        @required ratingId the unique identifier of the rating
+        ---
+        getRatingById(
+            sync ratingId : long,
+            sync out responseDto : domain::ratingCore.RatingResponse,
+            sync out fault notFound : string
+        );
+
+        ---
+        Get the rating associated with a specific booking.
+
+        @required bookingId the booking reference
+        ---
+        getRatingByBookingId(
+            sync bookingId : long,
+            sync out responseDto : domain::ratingCore.RatingResponse,
+            sync out fault notFound : string
+        );
+
+        ---
+        Get all ratings for a specific vehicle.
+
+        @required vehicleId the vehicle identifier
+        ---
+        getVehicleRatings(
+            sync vehicleId : long,
+            sync out ratings : domain::ratingCore.RatingResponses
+        );
+
+        ---
+        Get the average vehicle score for a specific vehicle.
+
+        @required vehicleId the vehicle identifier
+        ---
+        getAverageVehicleScore(
+            sync vehicleId : long,
+            sync out average : double
+        );
+
+        ---
+        Get all ratings for a specific provider.
+
+        @required providerId the provider identifier
+        ---
+        getProviderRatings(
+            sync providerId : long,
+            sync out ratings : domain::ratingCore.RatingResponses
+        );
+    }
+}

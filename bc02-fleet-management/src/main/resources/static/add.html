@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Vehicle</title>
+    <link rel="stylesheet" href="http://localhost:8080/styles.css">
+</head>
+<body>
+
+<div class="fleet-shell">
+
+    <header class="topbar">
+        <div class="topbar-brand">
+            <span class="badge-bc">BC-02</span>
+            <h1>Fleet Management</h1>
+        </div>
+        <nav class="nav-links">
+            <a href="list.html">Vehicles</a>
+            <a href="add.html">Add Vehicle</a>
+            <a href="search.html">Search Nearby</a>
+        </nav>
+    </header>
+
+    <section class="hero-banner">
+        <div>
+            <h2>Add a New Vehicle</h2>
+            <p>Create a vehicle for a provider with daily pricing, location, and usage restrictions.</p>
+        </div>
+        <div class="hero-icon">ADD</div>
+    </section>
+
+    <section class="section-panel">
+        <h3><span class="dot"></span>Vehicle Details</h3>
+
+        <form id="vehicleForm">
+            <div class="form-grid">
+
+                <label>
+                    Provider ID
+                    <input type="number" id="providerId" value="1" required>
+                </label>
+
+                <label>
+                    Vehicle Name
+                    <input type="text" id="name" placeholder="Tier E-Scooter" required>
+                </label>
+
+                <label>
+                    Type
+                    <select id="type" required>
+                        <option value="E_SCOOTER">E-Scooter</option>
+                        <option value="BICYCLE">Bicycle</option>
+                        <option value="E_BIKE">E-Bike</option>
+                        <option value="E_CAR">E-Car</option>
+                    </select>
+                </label>
+
+                <label>
+                    Price Per Day
+                    <input type="number" step="0.01" id="price" placeholder="8.00" required>
+                </label>
+
+                <label>
+                    Description
+                    <input type="text" id="description" placeholder="Dortmund City vehicle">
+                </label>
+
+                <label>
+                    Latitude
+                    <input type="number" step="0.0001" id="lat" placeholder="51.5136" required>
+                </label>
+
+                <label>
+                    Longitude
+                    <input type="number" step="0.0001" id="lon" placeholder="7.4653" required>
+                </label>
+
+                <label>
+                    Max Duration Minutes
+                    <input type="number" id="maxDuration" placeholder="120">
+                </label>
+
+                <label>
+                    Max Kilometers
+                    <input type="number" id="maxKm" placeholder="30">
+                </label>
+
+                <label>
+                    Minimum Age
+                    <input type="number" id="minAge" placeholder="18">
+                </label>
+
+                <label>
+                    Max Persons
+                    <input type="number" id="maxPersons" placeholder="1">
+                </label>
+
+                <label>
+                    Billing Model
+                    <input type="text" value="PER_DAY" disabled>
+                </label>
+
+            </div>
+
+            <div style="margin-top: 1rem; display: flex; gap: .7rem; flex-wrap: wrap;">
+                <button type="submit">Add Vehicle</button>
+                <a href="list.html" class="primary-btn secondary-btn">View Vehicles</a>
+            </div>
+
+            <p id="message" class="message"></p>
+        </form>
+    </section>
+
+</div>
+
+<script>
+document.getElementById("vehicleForm").addEventListener("submit", addVehicle);
+
+async function addVehicle(event) {
+    event.preventDefault();
+
+    const providerId = document.getElementById("providerId").value;
+    const message = document.getElementById("message");
+
+    const vehicle = {
+        name: document.getElementById("name").value.trim(),
+        type: document.getElementById("type").value,
+        description: document.getElementById("description").value.trim(),
+        currentLatitude: Number(document.getElementById("lat").value),
+        currentLongitude: Number(document.getElementById("lon").value),
+        pricePerUnit: Number(document.getElementById("price").value),
+        billingModel: "PER_DAY",
+        maxDurationMinutes: Number(document.getElementById("maxDuration").value),
+        maxKilometers: Number(document.getElementById("maxKm").value),
+        minAge: Number(document.getElementById("minAge").value),
+        maxPersons: Number(document.getElementById("maxPersons").value)
+    };
+
+    if (!vehicle.name) {
+        message.textContent = "Vehicle name is required.";
+        message.className = "message error";
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://localhost:8082/providers/${providerId}/vehicles`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(vehicle)
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || "Vehicle could not be added");
+        }
+
+        message.textContent = "Vehicle added successfully.";
+        message.className = "message success";
+
+        document.getElementById("vehicleForm").reset();
+        document.getElementById("providerId").value = providerId;
+
+    } catch (error) {
+        message.textContent = "Could not add vehicle. The name may already exist for this provider.";
+        message.className = "message error";
+    }
+}
+</script>
+
+</body>
+</html>

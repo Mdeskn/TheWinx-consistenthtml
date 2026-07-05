@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" href="http://localhost:8080/styles.css">
+    <title>Payments</title>
+</head>
+
+<body>
+<div class="container">
+    <div class="panel">
+        <p class="eyebrow">BC-04</p>
+        <h1>Payment Microservice</h1>
+        <p>This UI demonstrates the Payment bounded context as an independent microservice.</p>
+        <a class="link-button" href="/payments/new">+ Create New Payment</a>
+    </div>
+
+    <div class="panel">
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>Payment ID</th>
+                    <th>Booking ID</th>
+                    <th>User ID</th>
+                    <th>Amount</th>
+                    <th>Currency</th>
+                    <th>Method</th>
+                    <th>Status</th>
+                    <th>Paid At</th>
+                    <th>Failure Reason</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="payment : ${payments}">
+                    <td th:text="${payment.paymentId}"></td>
+                    <td th:text="${payment.bookingId}"></td>
+                    <td th:text="${payment.userId}"></td>
+                    <td th:text="${payment.amount}"></td>
+                    <td th:text="${payment.currency}"></td>
+                    <td th:text="${payment.paymentMethod}"></td>
+                    <td th:text="${payment.status}" th:class="${payment.status}"></td>
+                    <td th:text="${payment.paidAt}"></td>
+                    <td th:text="${payment.failureReason}"></td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(payments)}">
+                    <td colspan="9" class="empty-state">No payments yet.</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+</html>

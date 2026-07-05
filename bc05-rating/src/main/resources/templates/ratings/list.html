@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ratings – Instant Mobility</title>
+    <link rel="stylesheet" href="http://localhost:8080/styles.css">
+</head>
+<body>
+<div class="container">
+
+    <div class="panel hero">
+        <div>
+            <p class="eyebrow">BC-05 Rating</p>
+            <h1 th:text="${filter != null ? filter : 'All Ratings'}">All Ratings</h1>
+            <p class="subtitle">Browse and filter ratings left by users after completed bookings.</p>
+        </div>
+        <div class="link-group">
+            <a class="link-button" th:href="@{/ratings/submit}">+ Submit Rating</a>
+            <a class="link-button secondary-button" th:href="@{/ratings}">All Ratings</a>
+        </div>
+    </div>
+
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+
+    <div th:if="${averageScore != null}" class="alert alert-info">
+        Average vehicle score for this filter:
+        <strong th:text="${#numbers.formatDecimal(averageScore, 1, 2)} + ' / 5'"></strong>
+    </div>
+
+    <div class="panel" th:if="${not #lists.isEmpty(ratings)}">
+        <h2>Ratings</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Booking</th>
+                    <th>User</th>
+                    <th>Vehicle</th>
+                    <th>Vehicle Score</th>
+                    <th>Provider</th>
+                    <th>Provider Score</th>
+                    <th>Comment</th>
+                    <th>Date</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="r : ${ratings}">
+                    <td th:text="${r.ratingId}"></td>
+                    <td th:text="'#' + r.bookingId"></td>
+                    <td th:text="${r.userId}"></td>
+                    <td>
+                        <a th:href="@{/ratings/vehicle/{id}(id=${r.vehicleId})}"
+                           th:text="'#' + r.vehicleId"></a>
+                    </td>
+                    <td>
+                        <span class="status"
+                              th:classappend="${r.vehicleScore >= 4} ? 'score-high' : (${r.vehicleScore == 3} ? 'score-mid' : 'score-low')"
+                              th:text="${r.vehicleScore} + '/5'"></span>
+                    </td>
+                    <td>
+                        <a th:href="@{/ratings/provider/{id}(id=${r.providerId})}"
+                           th:text="'#' + r.providerId"></a>
+                    </td>
+                    <td>
+                        <span class="status"
+                              th:classappend="${r.providerScore >= 4} ? 'score-high' : (${r.providerScore == 3} ? 'score-mid' : 'score-low')"
+                              th:text="${r.providerScore} + '/5'"></span>
+                    </td>
+                    <td>
+                        <span th:if="${r.comment != null and !r.comment.isEmpty()}"
+                              th:text="${#strings.abbreviate(r.comment, 40)}"
+                              style="font-style: italic; color: #6b7285;"></span>
+                        <span th:if="${r.comment == null or r.comment.isEmpty()}"
+                              style="color: #aab;">-</span>
+                    </td>
+                    <td th:text="${#temporals.format(r.createdAt, 'yyyy-MM-dd')}"></td>
+                    <td>
+                        <a th:href="@{/ratings/{id}(id=${r.ratingId})}"
+                           class="link-button secondary-button"
+                           style="font-size:0.78rem; padding: 0.3rem 0.6rem;">View</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="panel empty-state" th:if="${#lists.isEmpty(ratings)}">
+        <p>No ratings found.</p>
+        <a th:href="@{/ratings/submit}" class="link-button">Submit the first rating</a>
+    </div>
+
+</div>
+</body>
+</html>

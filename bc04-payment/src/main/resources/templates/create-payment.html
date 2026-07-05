@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link rel="stylesheet" href="http://localhost:8080/styles.css">
+    <title>Create Payment</title>
+</head>
+
+<body>
+<div class="container">
+    <div class="panel">
+        <p class="eyebrow">BC-04</p>
+        <h1>Create Payment</h1>
+        <p>Booking data is mocked here by manually entering booking ID, user ID, and amount.</p>
+
+        <form th:action="@{/payments}" method="post" class="form-grid">
+            <label>Booking ID
+                <input type="number" name="bookingId" value="1001" required>
+            </label>
+
+            <label>User ID
+                <input type="number" name="userId" value="501" required>
+            </label>
+
+            <label>Amount
+                <input type="number" step="0.01" name="amount" value="29.99" required>
+            </label>
+
+            <label>Currency
+                <input type="text" name="currency" value="EUR" required>
+            </label>
+
+            <label>Payment Method
+                <select name="paymentMethod">
+                    <option th:each="method : ${paymentMethods}"
+                            th:value="${method}"
+                            th:text="${method}">
+                    </option>
+                </select>
+            </label>
+
+            <div style="grid-column:1/-1;display:flex;gap:1rem;align-items:center">
+                <button class="link-button" type="submit">Process Payment</button>
+                <a class="secondary-button" href="/payments">Back to Payments</a>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

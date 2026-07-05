@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User – Identity &amp; Access Service</title>
+    <link rel="stylesheet" href="http://localhost:8080/styles.css">
+</head>
+<body>
+<main class="container">
+    <header class="panel hero">
+        <div>
+            <p class="eyebrow">Identity &amp; Access</p>
+            <h1>Edit User</h1>
+            <p class="subtitle">Update the username and email for this account.</p>
+        </div>
+        <div class="link-group">
+            <a class="link-button secondary-button" href="/">Back to Console</a>
+        </div>
+    </header>
+
+    <section class="panel">
+        <h2>Update User #<span th:text="${user.id}"></span></h2>
+
+        <p th:if="${error}" class="error-message" th:text="${error}"></p>
+
+        <form class="create-user-form" th:action="@{/ui/users/{id}(id=${user.id})}" method="post">
+            <label>Username
+                <input type="text" name="username" th:value="${user.username}" required>
+            </label>
+            <label>Email
+                <input type="email" name="email" th:value="${user.email}" required>
+            </label>
+            <button type="submit">Save Changes</button>
+        </form>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,21 @@
+import microservices from "ratingCore.services" as ratingCoreServices
+import technology from "../technology/docker.technology" as Docker
+import technology from "../technology/javaWithSpring.technology" as java
+
+@technology(Docker)
+@technology(java)
+container RatingCoreContainer deployment technology Docker::_deployment.Docker
+    deploys ratingCoreServices::com.winx.rating.RatingCore {
+
+    aspects {
+        Docker::_aspects.Dockerfile('FROM eclipse-temurin:21-jre COPY bc05-rating-0.1.0-SNAPSHOT.jar app.jar EXPOSE 8085 ENTRYPOINT ["java", "-jar", "app.jar"]');
+    }
+
+    ratingCoreServices::com.winx.rating.RatingCore {
+        basic endpoints {
+            java::_protocols.rest: "http://localhost:8085";
+            java::_protocols.soap: "http://localhost:8085";
+            java::_protocols.amqp: "amqp://localhost:5672";
+        }
+    }
+}

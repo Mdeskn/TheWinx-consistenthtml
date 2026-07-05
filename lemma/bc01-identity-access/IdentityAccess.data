@@ -1,0 +1,160 @@
+context IdentityAccess {
+
+    enum AccountStatus {
+        ACTIVE,
+        INACTIVE,
+        LOCKED
+    }
+
+    collection Permissions { string }
+    collection RoleNames { string }
+
+    // @Table(name = "roles")
+    structure Role<entity> {
+        // @GeneratedValue(strategy = GenerationType.IDENTITY)
+        long id<identifier>,
+        // @Column(nullable = false, unique = true, length = 50)
+        string name,
+        // @ElementCollection(fetch = FetchType.EAGER)
+        // @CollectionTable(name = "role_permissions", joinColumns = @JoinColumn(name = "role_id"))
+        Permissions permissions
+    }
+
+    collection Roles { Role r }
+
+    // @Table(name = "user_accounts")
+    structure UserAccount<aggregate, entity> {
+        // @GeneratedValue(strategy = GenerationType.IDENTITY)
+        long id<identifier>,
+        // @Column(nullable = false, unique = true, length = 60)
+        string username,
+        // @Column(nullable = false, unique = true, length = 120)
+        string email,
+        // @Column(nullable = false)
+        string passwordHash,
+        // @Enumerated(EnumType.STRING) @Column(nullable = false, length = 20)
+        AccountStatus status,
+        // @ManyToMany(fetch = FetchType.EAGER)
+        Roles roles<part>,
+
+        procedure updateProfile(string username, string email),
+        procedure assignRole(Role role),
+        procedure revokeRole(Role role)
+    }
+
+    structure UserAccountRepository<repository> {
+        function UserAccount findByUsername(string username),
+        function UserAccount findByEmail(string email)
+    }
+
+    structure RoleRepository<repository> {
+        function Role findByName(string name)
+    }
+
+    structure IdentityAccessService<applicationService> {
+        function UserAccount register(string username, string email, string plainPassword),
+        function UserAccount updateUser(long userId, string username, string email),
+        function UserAccount deactivateUser(long userId),
+        function UserAccount assignRole(long userId, string roleName),
+        function UserAccount revokeRole(long userId, string roleName),
+        function AuthResponse authenticate(string username, string plainPassword),
+        function boolean hasPermission(long userId, string permission)
+    }
+
+    structure RegisterUserRequest<valueObject> {
+        immutable string username<neverEmpty>,
+        immutable string email<neverEmpty>,
+        immutable string password<neverEmpty>
+    }
+
+    structure UpdateUserRequest<valueObject> {
+        immutable string username<neverEmpty>,
+        immutable string email<neverEmpty>
+    }
+
+    structure RoleAssignmentRequest<valueObject> {
+        immutable string roleName<neverEmpty>
+    }
+
+    structure AuthRequest<valueObject> {
+        immutable string username<neverEmpty>,
+        immutable string password<neverEmpty>
+    }
+
+    structure AuthResponse<valueObject> {
+        immutable long userId,
+        immutable string username,
+        immutable Permissions permissions,
+        immutable string tokenType
+    }
+
+    structure UserResponse<valueObject> {
+        immutable long id,
+        immutable string username,
+        immutable string email,
+        immutable AccountStatus status,
+        immutable RoleNames roles
+    }
+
+    collection UserResponses { UserResponse u }
+
+    structure PermissionCheckResponse<valueObject> {
+        immutable long userId,
+        immutable string permission,
+        immutable boolean granted
+    }
+
+    structure ApiErrorResponse<valueObject> {
+        immutable string message,
+        immutable date timestamp
+    }
+
+    structure BookingIdentityCheckResponse<valueObject> {
+        immutable boolean verified,
+        immutable string reason
+    }
+
+    structure PaymentEligibilityResponse<valueObject> {
+        immutable long userId,
+        immutable boolean eligible,
+        immutable string status
+    }
+
+    structure ProviderAccessResponse<valueObject> {
+        immutable long userId,
+        immutable boolean canAccess,
+        immutable string status
+    }
+
+    structure VehicleInfo<valueObject> {
+        immutable long id,
+        immutable string type,
+        immutable string description,
+        immutable string status,
+        immutable double pricePerUnit,
+        immutable string billingModel,
+        immutable int maxPersons
+    }
+
+    collection VehicleInfos { VehicleInfo v }
+
+    structure BookingInfo<valueObject> {
+        immutable long id,
+        immutable long vehicleId,
+        immutable string vehicleName,
+        immutable string plate,
+        immutable string username,
+        immutable date pickupDate,
+        immutable date returnDate,
+        immutable string status
+    }
+
+    collection BookingInfos { BookingInfo b }
+
+    structure VehicleBookingRequest<valueObject> {
+        immutable long vehicleId,
+        immutable string username<neverEmpty>,
+        immutable date pickupDate,
+        immutable date returnDate
+    }
+}

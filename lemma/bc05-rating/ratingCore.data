@@ -1,0 +1,118 @@
+context ratingCore {
+    // ── Value Objects ──────────────────────────────────────────────────────────
+
+    // @Embeddable
+    structure Score<valueObject> {
+        // @Column(nullable = false)
+        immutable int value
+    }
+
+    // @Embeddable
+    structure Review<valueObject> {
+        // @Embedded @AttributeOverride(name = "value", column = @Column(name = "vehicle_score"))
+        immutable Score vehicleScore,
+        // @Embedded @AttributeOverride(name = "value", column = @Column(name = "provider_score"))
+        immutable Score providerScore,
+        // @Column(length = 1000)
+        immutable string comment
+    }
+
+    // @Embeddable
+    structure RatingTarget<valueObject> {
+        // @Column(nullable = false)
+        immutable long vehicleId,
+        // @Column(nullable = false)
+        immutable long providerId,
+        // @Column(name = "booking_id", nullable = false, unique = true)
+        immutable long bookingId
+    }
+
+    // ── Aggregate Root ─────────────────────────────────────────────────────────
+
+    // @Entity
+    // @Table(name = "ratings")
+    structure Rating<entity, aggregate> {
+        // @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+        immutable long ratingId<identifier>,
+        // @Column(nullable = false)
+        immutable long userId,
+        // @Column(nullable = false)
+        immutable string createdAt,
+        // @Embedded
+        immutable Review review<part>,
+        // @Embedded
+        immutable RatingTarget target<part>
+    }
+
+    collection Ratings {
+        Rating r
+    }
+
+    // ── DTOs ───────────────────────────────────────────────────────────────────
+
+    structure SubmitRatingRequest<valueObject> {
+        immutable long bookingId,
+        immutable long userId,
+        immutable long vehicleId,
+        immutable long providerId,
+        // @Min(1) @Max(5)
+        immutable int vehicleScore,
+        // @Min(1) @Max(5)
+        immutable int providerScore,
+        immutable string comment
+    }
+
+    structure RatingResponse<valueObject> {
+        immutable long ratingId,
+        immutable long bookingId,
+        immutable long userId,
+        immutable long vehicleId,
+        immutable long providerId,
+        immutable int vehicleScore,
+        immutable int providerScore,
+        immutable string comment,
+        immutable string createdAt
+    }
+
+    collection RatingResponses {
+        RatingResponse r
+    }
+
+    // ── Repository ─────────────────────────────────────────────────────────────
+
+    // @Repository
+    structure RatingRepository<repository> {
+        function Rating findById(long ratingId),
+        function Ratings findAll,
+        function Ratings findByVehicleId(long vehicleId),
+        function Ratings findByProviderId(long providerId),
+        function Rating findByBookingId(long bookingId),
+        function boolean existsByBookingId(long bookingId),
+        function Rating save(Rating rating)
+    }
+
+    // ── Application Services ───────────────────────────────────────────────────
+
+    // @Service
+    structure RatingSubmissionService<applicationService> {
+        function Rating submitRating(
+            long bookingId,
+            long userId,
+            long vehicleId,
+            long providerId,
+            int vehicleScore,
+            int providerScore,
+            string comment
+        )
+    }
+
+    // @Service
+    structure RatingQueryService<applicationService> {
+        function Rating getById(long ratingId),
+        function Ratings getAll,
+        function Rating getByBookingId(long bookingId),
+        function Ratings getVehicleRatings(long vehicleId),
+        function Ratings getProviderRatings(long providerId),
+        function double getAverageVehicleScore(long vehicleId)
+    }
+}

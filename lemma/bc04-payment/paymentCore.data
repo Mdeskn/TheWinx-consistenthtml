@@ -1,0 +1,73 @@
+context paymentCore {
+    structure Payment<entity, aggregate> {
+        // Id
+        // GeneratedValue
+        immutable long paymentId<identifier>,
+
+        // Reference only to the Booking bounded context
+        immutable long bookingId,
+
+        immutable long userId,
+
+        immutable double amount,
+
+        immutable string currency,
+
+        PaymentMethod paymentMethod<part>,
+
+        PaymentStatus status,
+
+        string paidAt,
+
+        string failureReason,
+
+        immutable string createdAt,
+
+        procedure markAsPaid(string paidAt),
+        procedure markAsFailed(string reason)
+    }
+
+    collection Payments {
+        Payment p
+    }
+
+    structure PaymentRequest<valueObject> {
+        immutable long bookingId,
+        immutable long userId,
+        immutable double amount,
+        immutable string currency,
+        immutable PaymentMethod paymentMethod
+    }
+
+    enum PaymentMethod {
+        CARD,
+        PAYPAL,
+        BANK_TRANSFER
+    }
+
+    enum PaymentStatus {
+        PENDING,
+        PAID,
+        FAILED
+    }
+
+    structure PaymentRepository<repository> {
+        function Payment findById(long paymentId),
+        function Payment findByBookingId(long bookingId),
+        function Payment save(Payment payment)
+    }
+
+    structure PaymentService<applicationService> {
+        function Payment createAndProcessPayment(
+            long bookingId,
+            long userId,
+            double amount,
+            string currency,
+            PaymentMethod paymentMethod
+        ),
+
+        function Payments getAllPayments,
+        function Payment getPaymentById(long paymentId),
+        function Payment getPaymentByBookingId(long bookingId)
+    }
+}

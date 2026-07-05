@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>All Vehicles</title>
+</head>
+<body>
+    <h1>All Vehicles</h1>
+
+    <button onclick="loadVehicles()">Load Vehicles</button>
+
+    <div id="vehicleList"></div>
+
+    <script>
+        function loadVehicles() {
+            const providerId = 1; // hardcode for now
+
+            fetch(`http://localhost:8090/providers/${providerId}/vehicles`)
+                .then(response => response.json())
+                .then(data => {
+                    const list = document.getElementById("vehicleList");
+                    list.innerHTML = "";
+
+                    data.forEach(v => {
+                        list.innerHTML += `
+                            <p>
+                                <strong>ID:</strong> ${v.id}<br>
+                                <strong>Type:</strong> ${v.type}<br>
+                                <strong>Status:</strong> ${v.status}<br>
+                                <strong>Description:</strong> ${v.description}<br>
+                                <strong>Latitude:</strong> ${v.currentLatitude}<br>
+                                <strong>Longitude:</strong> ${v.currentLongitude}
+                            </p>
+                            <hr>
+                        `;
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Error loading vehicles");
+                });
+        }
+    </script>
+</body>
+</html>

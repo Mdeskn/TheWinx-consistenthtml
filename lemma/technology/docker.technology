@@ -1,0 +1,24 @@
+technology Docker {
+    deployment technologies {
+        Docker {
+            operation environments = "eclipse-temurin:21-jre-alpine" default;
+
+            service properties {
+                string springApplicationName;
+                int serverPort;
+                string springDatasourceUrl;
+                string eurekaUri;
+            }
+        }
+    }
+
+    operation aspects {
+        aspect Dockerfile<singleval> for containers, infrastructure {
+            string content<mandatory>;
+        }
+
+        aspect ComposePart<singleval> for containers, infrastructure {
+            string content<mandatory>;
+        }
+    }
+}

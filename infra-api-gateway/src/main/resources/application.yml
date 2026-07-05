@@ -1,0 +1,38 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: infra-api-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: identity
+          uri: lb://bc01-identity-access
+          predicates: [Path=/api/identity/**]
+          filters: [StripPrefix=2]
+        - id: fleet
+          uri: lb://bc02-fleet-management
+          predicates: [Path=/api/fleet/**]
+          filters: [StripPrefix=2]
+        - id: booking
+          uri: lb://bc03-booking
+          predicates: [Path=/api/booking/**]
+          filters: [StripPrefix=2]
+        - id: payment
+          uri: lb://bc04-payment
+          predicates: [Path=/api/payment/**]
+          filters: [StripPrefix=2]
+        - id: rating
+          uri: lb://bc05-rating
+          predicates: [Path=/api/rating/**]
+          filters: [StripPrefix=2]
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

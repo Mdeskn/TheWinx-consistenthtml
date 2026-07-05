@@ -1,0 +1,174 @@
+import microservices from "ratingCore.services" as ratingCoreServices
+import technology from "../technology/javaWithSpring.technology" as java
+import technology from "../technology/map.technology" as map
+
+// ── Domain Type Mappings ───────────────────────────────────────────────────────
+
+@technology(java)
+type ratingCoreServices::domain::ratingCore.Score {
+    aspects { java::_aspects.Table("scores"); }
+}
+
+@technology(java)
+type ratingCoreServices::domain::ratingCore.Review {
+}
+
+@technology(java)
+type ratingCoreServices::domain::ratingCore.RatingTarget {
+}
+
+@technology(java)
+type ratingCoreServices::domain::ratingCore.Rating {
+    aspects { java::_aspects.Table("ratings"); }
+
+    ratingId {
+        aspects { java::_aspects.GeneratedValue; }
+    }
+}
+
+@technology(java)
+@technology(map)
+type ratingCoreServices::domain::ratingCore.SubmitRatingRequest {
+    aspects { map::_aspects.AtomicParameterList; }
+}
+
+@technology(java)
+@technology(map)
+type ratingCoreServices::domain::ratingCore.RatingResponse {
+    aspects { map::_aspects.AtomicParameterList; }
+}
+
+@technology(java)
+type ratingCoreServices::domain::ratingCore.RatingRepository {
+}
+
+@technology(java)
+type ratingCoreServices::domain::ratingCore.RatingSubmissionService {
+}
+
+@technology(java)
+type ratingCoreServices::domain::ratingCore.RatingQueryService {
+}
+
+// ── Microservice Mapping ───────────────────────────────────────────────────────
+
+@technology(java)
+@technology(map)
+ratingCoreServices::com.winx.rating.RatingCore {
+    aspects {
+        java::_aspects.ApplicationName("bc05-rating");
+
+        java::_aspects.JacksonConfiguration(
+            INDENT_OUTPUT=true,
+            defaultPropertyInclusion="NON_NULL"
+        );
+
+        java::_aspects.DatasourceConfiguration(
+            url="jdbc:h2:mem:rating",
+            username="sa",
+            password="",
+            driverClassName="org.h2.Driver"
+        );
+
+        java::_aspects.HibernateConfiguration("update");
+
+        java::_aspects.Port(8085);
+    }
+
+    interface ratingSubmission {
+        endpoints { java::_protocols.rest: "/api/ratings"; }
+        aspects { map::_aspects.InformationHolderResource; }
+    }
+
+    interface ratingQuery {
+        aspects { map::_aspects.InformationHolderResource; }
+    }
+
+    operation ratingSubmission.submitRating {
+        aspects { java::_aspects.PostMapping; }
+
+        parameters {
+            complex requestDto {
+                aspects {
+                    java::_aspects.Valid;
+                    java::_aspects.RequestBody;
+                }
+            }
+            complex responseDto : java::_types.ResponseEntity;
+            primitive duplicateRating {
+                aspects { java::_aspects.ResponseStatus("CONFLICT"); }
+            }
+            primitive bookingNotCompleted {
+                aspects { java::_aspects.ResponseStatus("CONFLICT"); }
+            }
+        }
+    }
+
+    operation ratingQuery.getAllRatings {
+        endpoints { java::_protocols.rest: "/api/ratings"; }
+        aspects { java::_aspects.GetMapping; }
+    }
+
+    operation ratingQuery.getRatingById {
+        endpoints { java::_protocols.rest: "/api/ratings/{ratingId}"; }
+        aspects { java::_aspects.GetMapping; }
+
+        parameters {
+            primitive ratingId {
+                aspects { java::_aspects.PathVariable; }
+            }
+            complex responseDto : java::_types.ResponseEntity;
+            primitive notFound {
+                aspects { java::_aspects.ResponseStatus("NOT_FOUND"); }
+            }
+        }
+    }
+
+    operation ratingQuery.getRatingByBookingId {
+        endpoints { java::_protocols.rest: "/api/ratings/booking/{bookingId}"; }
+        aspects { java::_aspects.GetMapping; }
+
+        parameters {
+            primitive bookingId {
+                aspects { java::_aspects.PathVariable; }
+            }
+            complex responseDto : java::_types.ResponseEntity;
+            primitive notFound {
+                aspects { java::_aspects.ResponseStatus("NOT_FOUND"); }
+            }
+        }
+    }
+
+    operation ratingQuery.getVehicleRatings {
+        endpoints { java::_protocols.rest: "/api/ratings/vehicle/{vehicleId}"; }
+        aspects { java::_aspects.GetMapping; }
+
+        parameters {
+            primitive vehicleId {
+                aspects { java::_aspects.PathVariable; }
+            }
+        }
+    }
+
+    operation ratingQuery.getAverageVehicleScore {
+        endpoints { java::_protocols.rest: "/api/ratings/vehicle/{vehicleId}/average"; }
+        aspects { java::_aspects.GetMapping; }
+
+        parameters {
+            primitive vehicleId {
+                aspects { java::_aspects.PathVariable; }
+            }
+        }
+    }
+
+    operation ratingQuery.getProviderRatings {
+        endpoints { java::_protocols.rest: "/api/ratings/provider/{providerId}"; }
+        aspects { java::_aspects.GetMapping; }
+
+        parameters {
+            primitive providerId {
+                aspects { java::_aspects.PathVariable; }
+            }
+        }
+    }
+}

@@ -1,0 +1,44 @@
+import microservices from "IdentityAccess.services" as IdentityAccessServices
+import technology from "../technology/docker.technology" as Docker
+import technology from "../technology/Java.technology" as ProtocolTechnology
+import nodes from "../eureka-server/eurekaServer.operation" as Eureka
+
+@technology(Docker)
+@technology(ProtocolTechnology)
+container IdentityAccessContainer deployment technology Docker::_deployment.Docker
+    deploys IdentityAccessServices::com.thewinx.identityaccess.IdentityAccess
+    depends on nodes Eureka::ServiceDiscovery {
+
+    aspects {
+        Docker::_aspects.Dockerfile('
+            FROM maven:3.9-eclipse-temurin-21 AS build
+            ARG BASE=/usr/src/app
+            COPY pom.xml ${BASE}/
+            COPY src ${BASE}/src
+            RUN --mount=type=cache,target=/root/.m2 mvn -f ${BASE}/pom.xml package -DskipTests
+
+            FROM eclipse-temurin:21-jre-alpine
+            COPY --from=build /usr/src/app/target/bc01-identity-access-0.1.0-SNAPSHOT.jar /app/app.jar
+
+            EXPOSE 8081
+            ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+        ');
+
+        Docker::_aspects.ComposePart('
+            bc01-identity-access:
+                build: bc01-identity-access
+                ports:
+                  - "8081:8081"
+                depends_on:
+                  - infra-eureka-server
+                environment:
+                  - "EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://infra-eureka-server:8761/eureka"
+                  - "SPRING_PROFILES_ACTIVE=default"
+        ');
+    }
+
+    IdentityAccessServices::com.thewinx.identityaccess.IdentityAccess {
+        basic endpoints { ProtocolTechnology::_protocols.rest: "http://localhost:8081"; }
+    }
+}
+

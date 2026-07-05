@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Vehicles</title>
+    <script src="api.js"></script>
+</head>
+<body>
+    <h2>Search Available Vehicles</h2>
+
+    <input id="lat" placeholder="Latitude"><br>
+    <input id="lon" placeholder="Longitude"><br>
+    <input id="radius" placeholder="Radius"><br>
+
+    <button onclick="search()">Search</button>
+
+    <ul id="results"></ul>
+
+    <script>
+        async function search() {
+            const lat = document.getElementById("lat").value;
+            const lon = document.getElementById("lon").value;
+            const radius = document.getElementById("radius").value;
+
+            const vehicles = await searchAvailable(lat, lon, radius);
+
+            const list = document.getElementById("results");
+            list.innerHTML = "";
+
+            vehicles.forEach(v => {
+                const li = document.createElement("li");
+                li.textContent = `ID: ${v.id}, Type: ${v.type}, Status: ${v.status}`;
+                list.appendChild(li);
+            });
+        }
+    </script>
+</body>
+</html>

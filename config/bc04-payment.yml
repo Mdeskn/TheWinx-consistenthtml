@@ -1,0 +1,7 @@
+# Per-service config served by infra-config-server (Task 2).
+resilience4j:
+  circuitbreaker:
+    instances:
+      gateway:
+        baseConfig: default
+        waitDurationInOpenState: 15s

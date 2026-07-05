@@ -1,0 +1,57 @@
+import technology from "../technology/docker.technology" as Docker
+import technology from "../technology/eureka.technology" as Eureka
+
+@technology(Docker)
+@technology(Eureka)
+ServiceDiscovery is Eureka::_infrastructure.Eureka {
+
+    aspects {
+        Docker::_aspects.Dockerfile('
+            FROM maven:3.9-eclipse-temurin-21 AS build
+            ARG BASE=/usr/src/app
+            COPY pom.xml ${BASE}/
+            COPY src ${BASE}/src
+            RUN mvn -f ${BASE}/pom.xml package -DskipTests
+
+            FROM eclipse-temurin:21-jre-alpine
+            COPY --from=build /usr/src/app/target/infra-eureka-server-0.1.0-SNAPSHOT.jar /app/app.jar
+
+            EXPOSE 8761
+            ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+        ');
+
+        Docker::_aspects.ComposePart('
+            infra-eureka-server:
+                build: infra-eureka-server
+                image: thewinx/eureka-server
+                ports:
+                  - "8761:8761"
+                volumes:
+                  - "maven_repo:/root/.m2"
+              bc01-identity-access:
+                build: bc01-identity-access
+                image: thewinx/bc01-identity-access
+                depends_on:
+                  - infra-eureka-server
+                environment:
+                  - "EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://infra-eureka-server:8761/eureka"
+                  - "SPRING_PROFILES_ACTIVE=eureka"
+                ports:
+                  - "8081:8081"
+                volumes:
+                  - "maven_repo:/root/.m2"
+            '
+        );
+    }
+
+    default values {
+        hostname="infra-eureka-server"
+        port=8761
+        imageType="jre"
+        mavenGroupId="com.thewinx"
+        mavenArtifactId="infra-eureka-server"
+        mavenVersion="0.1.0-SNAPSHOT"
+        mavenName="Eureka Server"
+        programmingLanguage="Java"
+    }
+}

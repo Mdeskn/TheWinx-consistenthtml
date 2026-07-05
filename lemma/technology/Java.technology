@@ -1,0 +1,81 @@
+technology Java {
+    types {
+        primitive type Boolean based on boolean default;
+        primitive type Byte based on byte default;
+        primitive type Character based on char default;
+        primitive type Date based on date default;
+        primitive type Double based on double default;
+        primitive type Float based on float default;
+        primitive type Integer based on int default;
+        primitive type Long based on long default;
+        primitive type Short based on short default;
+        primitive type String based on string default;
+        primitive type Object based on unspecified default;
+        primitive type BigDecimal based on double;
+        
+        structure type Message;
+        structure type Optional;
+        structure type ResponseEntity;
+
+        collection type Array;
+        collection type Collection;
+        collection type Set;
+        collection type ResponseEntities;
+    }
+
+    protocols {
+        sync rest data formats "application/json"
+            default with format "application/json";
+    }
+
+    service aspects {
+        aspect ApplicationName<singleval> for microservices {
+            string value<mandatory>;
+        }
+
+        aspect Port<singleval> for microservices {
+            int portNumber<mandatory>;
+        }
+
+        aspect DatasourceConfiguration<singleval> for microservices {
+            string url;
+            string username;
+            string password;
+            string driverClassName;
+        }
+
+        aspect HibernateConfiguration<singleval> for microservices {
+            string ddlAuto;
+        }
+
+        aspect GetMapping<singleval> for operations;
+        aspect PostMapping<singleval> for operations;
+        aspect PutMapping<singleval> for operations;
+        aspect DeleteMapping<singleval> for operations;
+
+        aspect PathVariable<singleval> for parameters {
+            selector(exchange_pattern = in);
+        }
+
+        aspect RequestBody<singleval> for parameters {
+            selector(exchange_pattern = in);
+        }
+
+        aspect RequestParam<singleval> for parameters {
+            selector(exchange_pattern = in);
+            string value;
+            string defaultValue = "";
+        }
+
+        aspect Valid<singleval> for fields, parameters;
+
+        aspect ResponseEntity<singleval> for parameters {
+            selector(exchange_pattern = out);
+        }
+
+        aspect FeignClient<singleval> for interfaces {
+            string name<mandatory>;
+            string url<mandatory>;
+        }
+    }
+}
