@@ -20,6 +20,16 @@ context fleetManagement {
         PER_KM
     }
 
+    // ── Value Objects ──────────────────────────────────────────────────────────
+
+    // @Embeddable
+    structure VehicleSpecs<valueObject> {
+        immutable int maxDurationMinutes,
+        immutable int maxKilometers,
+        immutable int minAge,
+        immutable int maxPersons
+    }
+
     // ── Aggregate Root ─────────────────────────────────────────────────────────
 
     // @Entity
@@ -39,10 +49,7 @@ context fleetManagement {
         // @Column(precision = 10, scale = 2)
         double pricePerUnit,
         BillingModel billingModel,
-        int maxDurationMinutes,
-        int maxKilometers,
-        int minAge,
-        int maxPersons
+        VehicleSpecs specs<part>
     }
 
     collection Vehicles {
@@ -65,13 +72,13 @@ context fleetManagement {
     }
 
     structure UpdateVehicleRequest<valueObject> {
-        string name,
-        string description,
-        double pricePerUnit,
-        int maxDurationMinutes,
-        int maxKilometers,
-        int minAge,
-        int maxPersons
+        immutable string name,
+        immutable string description,
+        immutable double pricePerUnit,
+        immutable int maxDurationMinutes,
+        immutable int maxKilometers,
+        immutable int minAge,
+        immutable int maxPersons
     }
 
     structure UpdateLocationRequest<valueObject> {

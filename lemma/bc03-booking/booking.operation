@@ -1,11 +1,14 @@
 import microservices from "booking.services" as bookingServices
 import technology from "../technology/docker.technology" as Docker
 import technology from "../technology/javaWithSpring.technology" as java
+import nodes from "../eureka-server/eurekaServer.operation" as eurekaOps
+import nodes from "../infra-config-server/configServer.operation" as configOps
 
 @technology(Docker)
 @technology(java)
 container BookingContainer deployment technology Docker::_deployment.Docker
-    deploys bookingServices::com.winx.booking.BookingCore {
+    deploys bookingServices::com.winx.booking.BookingCore
+    depends on nodes eurekaOps::ServiceDiscovery, configOps::ConfigServer {
 
     aspects {
         Docker::_aspects.Dockerfile('FROM eclipse-temurin:21-jre COPY bc03-booking-0.1.0-SNAPSHOT.jar app.jar EXPOSE 8083 ENTRYPOINT ["java", "-jar", "app.jar"]');
@@ -14,6 +17,8 @@ container BookingContainer deployment technology Docker::_deployment.Docker
     bookingServices::com.winx.booking.BookingCore {
         basic endpoints {
             java::_protocols.rest: "http://localhost:8083";
+            java::_protocols.soap: "http://localhost:8083";
+            java::_protocols.amqp: "localhost:5672";
         }
     }
 }

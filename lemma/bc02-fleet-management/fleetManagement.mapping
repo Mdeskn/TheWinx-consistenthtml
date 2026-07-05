@@ -90,12 +90,10 @@ fleetServices::com.winx.fleet.FleetManagement {
     }
 
     interface vehicleQuery {
-        endpoints { java::_protocols.rest: "/api/v1/vehicles"; }
         aspects { map::_aspects.InformationHolderResource; }
     }
 
     interface fleetStatus {
-        endpoints { java::_protocols.rest: "/api/v1/vehicles"; }
         aspects { map::_aspects.InformationHolderResource; }
     }
 
@@ -133,7 +131,7 @@ fleetServices::com.winx.fleet.FleetManagement {
     }
 
     operation vehicleRegistration.deleteVehicle {
-        endpoints { java::_protocols.rest: "/api/v1/vehicles/{vehicleId}"; }
+        endpoints { java::_protocols.rest: "/api/v1/vehicles/{vehicleId}/delete"; }
         aspects { java::_aspects.DeleteMapping; }
         parameters {
             primitive vehicleId {
@@ -146,11 +144,12 @@ fleetServices::com.winx.fleet.FleetManagement {
     }
 
     operation vehicleQuery.getAllVehicles {
+        endpoints { java::_protocols.rest: "/api/v1/vehicles"; }
         aspects { java::_aspects.GetMapping; }
     }
 
     operation vehicleQuery.getVehicleById {
-        endpoints { java::_protocols.rest: "/api/v1/vehicles/{vehicleId}"; }
+        endpoints { java::_protocols.rest: "/api/v1/vehicles/{vehicleId}/detail"; }
         aspects { java::_aspects.GetMapping; }
         parameters {
             primitive vehicleId {

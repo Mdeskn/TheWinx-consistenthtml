@@ -7,6 +7,9 @@ public functional microservice com.winx.booking.BookingCore {
         Start a new booking for the authenticated user. Validates the user via
         BC-01 (identity), checks vehicle availability via BC-02 (fleet), and
         marks the vehicle as BOOKED on success.
+
+        @required authToken the authentication token identifying the requesting user
+        @required requestDto the booking request containing vehicleId and start location
         ---
         createBooking(
             sync authToken : string,
@@ -19,6 +22,8 @@ public functional microservice com.winx.booking.BookingCore {
 
         ---
         Cancel an active booking and release the vehicle back to AVAILABLE.
+
+        @required bookingId the unique identifier of the booking to cancel
         ---
         cancelBooking(
             sync bookingId : long,
@@ -28,8 +33,10 @@ public functional microservice com.winx.booking.BookingCore {
         );
 
         ---
-        Complete a ride: record end location, distance, and compute total cost.
-        Releases the vehicle and publishes a BookingCompleted event for BC-04.
+        Complete a ride: record end location, distance, and compute the total cost.
+
+        @required bookingId the unique identifier of the booking to end
+        @required requestDto the end-ride data including end location and distance
         ---
         endBooking(
             sync bookingId : long,
@@ -43,6 +50,8 @@ public functional microservice com.winx.booking.BookingCore {
     interface bookingQuery {
         ---
         Retrieve a booking by its ID.
+
+        @required bookingId the unique identifier of the booking
         ---
         getBookingById(
             sync bookingId : long,
@@ -52,6 +61,8 @@ public functional microservice com.winx.booking.BookingCore {
 
         ---
         Retrieve all bookings for a given user.
+
+        @required userId the unique identifier of the user whose bookings to retrieve
         ---
         getBookingsByUser(
             sync userId : long,

@@ -5,6 +5,8 @@ public functional microservice com.winx.fleet.FleetManagement {
     interface vehicleRegistration {
         ---
         Register a new vehicle in the fleet.
+
+        @required requestDto the vehicle details including type, pricing, and specifications
         ---
         registerVehicle(
             sync requestDto : domain::fleetManagement.CreateVehicleRequest,
@@ -14,6 +16,9 @@ public functional microservice com.winx.fleet.FleetManagement {
 
         ---
         Update vehicle details.
+
+        @required vehicleId the unique identifier of the vehicle to update
+        @required requestDto the updated vehicle fields
         ---
         updateVehicle(
             sync vehicleId : long,
@@ -24,6 +29,8 @@ public functional microservice com.winx.fleet.FleetManagement {
 
         ---
         Remove a vehicle from the fleet.
+
+        @required vehicleId the unique identifier of the vehicle to delete
         ---
         deleteVehicle(
             sync vehicleId : long,
@@ -39,6 +46,8 @@ public functional microservice com.winx.fleet.FleetManagement {
 
         ---
         Retrieve a single vehicle by its ID.
+
+        @required vehicleId the unique identifier of the vehicle
         ---
         getVehicleById(
             sync vehicleId : long,
@@ -48,6 +57,10 @@ public functional microservice com.winx.fleet.FleetManagement {
 
         ---
         Find available vehicles near a given geographic position.
+
+        @required lat the latitude of the search center point
+        @required lon the longitude of the search center point
+        @required radiusKm the search radius in kilometers
         ---
         findAvailableNear(
             sync lat : double,
@@ -60,6 +73,9 @@ public functional microservice com.winx.fleet.FleetManagement {
     interface fleetStatus {
         ---
         Update the current GPS location of a vehicle.
+
+        @required vehicleId the unique identifier of the vehicle
+        @required requestDto the new latitude and longitude coordinates
         ---
         updateLocation(
             sync vehicleId : long,
@@ -70,6 +86,9 @@ public functional microservice com.winx.fleet.FleetManagement {
 
         ---
         Change the operational status of a vehicle (e.g., AVAILABLE, BOOKED, MAINTENANCE).
+
+        @required vehicleId the unique identifier of the vehicle
+        @required requestDto the new status value to apply
         ---
         updateStatus(
             sync vehicleId : long,

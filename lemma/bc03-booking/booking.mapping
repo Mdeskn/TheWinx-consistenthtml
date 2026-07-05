@@ -86,7 +86,6 @@ bookingServices::com.winx.booking.BookingCore {
     }
 
     interface bookingQuery {
-        endpoints { java::_protocols.rest: "/api/v1/bookings"; }
         aspects { map::_aspects.InformationHolderResource; }
     }
 
@@ -94,7 +93,7 @@ bookingServices::com.winx.booking.BookingCore {
         aspects { java::_aspects.PostMapping; }
         parameters {
             primitive authToken {
-                aspects { java::_aspects.RequestHeader("Authorization"); }
+                aspects { java::_aspects.RequestParam; }
             }
             complex requestDto {
                 aspects {

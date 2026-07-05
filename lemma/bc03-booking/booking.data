@@ -32,7 +32,7 @@ context booking {
     // @Embeddable
     structure TimeInterval<valueObject> {
         immutable string startedAt,
-        string endedAt
+        immutable string endedAt
     }
 
     // @Embeddable
@@ -116,7 +116,7 @@ context booking {
     structure BookingRepository<repository> {
         function Booking findById(long bookingId),
         function Bookings findByUserId(long userId),
-        function Booking findFirstByUserIdAndStatus(long userId, BookingStatus status),
+        function Booking findFirstByUserIdAndStatus(long userId, string status),
         function Booking save(Booking booking)
     }
 
