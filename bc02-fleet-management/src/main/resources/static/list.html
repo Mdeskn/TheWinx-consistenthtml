@@ -5,6 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fleet Management – Vehicles</title>
     <link rel="stylesheet" href="http://localhost:8080/styles.css">
+    <style>
+        tr.vehicle-row { cursor: pointer; }
+        tr.vehicle-row:hover td { background: var(--surface-2, #f5f5f5); }
+        tr.detail-row { display: none; }
+        tr.detail-row.open { display: table-row; }
+        .detail-panel {
+            background: var(--surface-2, #f5f5f5);
+            padding: 1rem 1.25rem;
+            border-radius: 6px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: .5rem 1.5rem;
+        }
+        .detail-panel dl { margin: 0; }
+        .detail-panel dt { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; opacity: .6; margin-bottom: .1rem; }
+        .detail-panel dd { margin: 0; font-weight: 600; }
+        .detail-panel .book-btn { grid-column: 1 / -1; margin-top: .5rem; }
+    </style>
 </head>
 <body>
 <main class="container">
@@ -50,9 +68,6 @@
         <h2>Vehicle List</h2>
 
         <div class="form-grid" style="margin-bottom:1rem;">
-            <label>Provider ID
-                <input type="number" id="providerId" value="1">
-            </label>
             <label>Filter by Type
                 <select id="typeFilter">
                     <option value="">All Types</option>
@@ -79,7 +94,7 @@
                 <thead>
                 <tr>
                     <th>ID</th><th>Name</th><th>Type</th><th>Description</th>
-                    <th>Status</th><th>Price / Day</th><th>Billing</th><th>Restrictions</th><th>Action</th>
+                    <th>Status</th><th>Price</th><th>Billing</th><th>Action</th>
                 </tr>
                 </thead>
                 <tbody id="vehicleTableBody"></tbody>
@@ -100,10 +115,9 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function loadVehicles() {
-    const providerId = document.getElementById("providerId").value || 1;
     const message = document.getElementById("message");
     try {
-        const response = await fetch(`http://localhost:8082/providers/${providerId}/vehicles`);
+        const response = await fetch("http://localhost:8082/vehicles");
         if (!response.ok) throw new Error();
         vehicles = await response.json();
         renderVehicles();
@@ -125,30 +139,58 @@ function renderVehicles() {
 
     tbody.innerHTML = "";
     filtered.forEach(v => {
-        const statusClass  = v.status === "AVAILABLE" ? "status-available" : "status-booked";
-        const nextStatus   = v.status === "AVAILABLE" ? "BOOKED" : "AVAILABLE";
-        const buttonText   = v.status === "AVAILABLE" ? "Mark Booked" : "Mark Available";
+        const statusClass = v.status === "AVAILABLE" ? "status-available" : "status-booked";
+        const nextStatus  = v.status === "AVAILABLE" ? "BOOKED" : "AVAILABLE";
+        const btnText     = v.status === "AVAILABLE" ? "Mark Booked" : "Mark Available";
+
         const row = document.createElement("tr");
+        row.className = "vehicle-row";
+        row.dataset.id = v.vehicleId;
         row.innerHTML = `
-            <td>${v.id}</td>
+            <td>${v.vehicleId}</td>
             <td><strong>${v.name || "-"}</strong></td>
             <td>${v.type}</td>
             <td>${v.description || "-"}</td>
             <td><span class="status ${statusClass}">${v.status}</span></td>
             <td>EUR ${v.pricePerUnit}</td>
             <td>${v.billingModel}</td>
-            <td>${v.maxDurationMinutes || "-"} min, ${v.maxKilometers || "-"} km, min age ${v.minAge || "-"}, ${v.maxPersons || "-"} persons</td>
             <td>
-                <button class="secondary-button" data-id="${v.id}" data-status="${nextStatus}">${buttonText}</button>
-                <button class="danger-button" data-delete-id="${v.id}" style="margin-left:.4rem">Delete</button>
+                <button class="secondary-button" data-id="${v.vehicleId}" data-status="${nextStatus}">${btnText}</button>
+                <button class="danger-button" data-delete-id="${v.vehicleId}" style="margin-left:.4rem">Delete</button>
             </td>`;
         tbody.appendChild(row);
+
+        const detailRow = document.createElement("tr");
+        detailRow.className = "detail-row";
+        detailRow.id = "detail-" + v.vehicleId;
+        const lat  = v.currentLatitude  != null ? v.currentLatitude.toFixed(4)  : "-";
+        const lon  = v.currentLongitude != null ? v.currentLongitude.toFixed(4) : "-";
+        const bookUrl = `http://localhost:8083/ui/search`;
+        detailRow.innerHTML = `
+            <td colspan="8">
+                <div class="detail-panel">
+                    <dl><dt>Provider ID</dt><dd>${v.providerId ?? "-"}</dd></dl>
+                    <dl><dt>Min Age</dt><dd>${v.minAge ?? "-"}</dd></dl>
+                    <dl><dt>Max Persons</dt><dd>${v.maxPersons ?? "-"}</dd></dl>
+                    <dl><dt>Location</dt><dd>${lat}, ${lon}</dd></dl>
+                    <div class="book-btn">
+                        <a class="link-button" href="${bookUrl}">Book via BC-03 Search</a>
+                    </div>
+                </div>
+            </td>`;
+        tbody.appendChild(detailRow);
+
+        row.addEventListener("click", e => {
+            if (e.target.closest("button")) return;
+            const detail = document.getElementById("detail-" + v.vehicleId);
+            detail.classList.toggle("open");
+        });
     });
 
     document.querySelectorAll("[data-id]").forEach(btn =>
-        btn.addEventListener("click", () => updateStatus(btn.dataset.id, btn.dataset.status)));
+        btn.addEventListener("click", e => { e.stopPropagation(); updateStatus(btn.dataset.id, btn.dataset.status); }));
     document.querySelectorAll("[data-delete-id]").forEach(btn =>
-        btn.addEventListener("click", () => deleteVehicle(btn.dataset.deleteId)));
+        btn.addEventListener("click", e => { e.stopPropagation(); deleteVehicle(btn.dataset.deleteId); }));
 
     updateStats();
 }
@@ -162,7 +204,7 @@ function updateStats() {
 async function updateStatus(id, newStatus) {
     const message = document.getElementById("message");
     try {
-        const r = await fetch(`http://localhost:8082/providers/vehicles/${id}/status`, {
+        const r = await fetch(`http://localhost:8082/vehicles/${id}/status`, {
             method: "PATCH", headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ status: newStatus })
         });
@@ -180,7 +222,7 @@ async function deleteVehicle(id) {
     const message = document.getElementById("message");
     if (!confirm("Delete this vehicle?")) return;
     try {
-        const r = await fetch(`http://localhost:8082/providers/vehicles/${id}`, { method: "DELETE" });
+        const r = await fetch(`http://localhost:8082/vehicles/${id}`, { method: "DELETE" });
         if (!r.ok) throw new Error();
         await loadVehicles();
         message.textContent = "Vehicle deleted.";

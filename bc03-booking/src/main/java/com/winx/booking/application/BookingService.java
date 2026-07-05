@@ -101,6 +101,11 @@ public class BookingService {
     }
 
     @Transactional(readOnly = true)
+    public List<Booking> findAll() {
+        return repository.findAll();
+    }
+
+    @Transactional(readOnly = true)
     public List<VehicleDto> searchVehicles(double lat, double lon, double radiusKm,
                                            String type, BigDecimal maxPrice) {
         return fleetGateway.search(lat, lon, radiusKm, type, maxPrice);

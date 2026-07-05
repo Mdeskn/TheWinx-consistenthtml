@@ -6,6 +6,7 @@ import com.winx.booking.api.dto.EndRideRequest;
 import com.winx.booking.application.BookingService;
 import com.winx.booking.domain.Booking;
 import com.winx.booking.exception.DomainException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,13 +26,14 @@ public class BookingWebController {
 
     @GetMapping("/search")
     public String search(@RequestParam(required = false) String location,
-                         @RequestParam(required = false, defaultValue = "2.0") Double radiusKm,
+                         @RequestParam(required = false, defaultValue = "5.0") Double radiusKm,
                          @RequestParam(required = false) String type,
                          @RequestParam(required = false) String token,
                          Model model) {
         DemoLocations.Location loc = DemoLocations.find(location);
+        String resolvedType = (type != null && !type.isBlank()) ? type : null;
         if (loc != null) {
-            model.addAttribute("results", service.searchVehicles(loc.latitude(), loc.longitude(), radiusKm, type, null));
+            model.addAttribute("results", service.searchVehicles(loc.latitude(), loc.longitude(), radiusKm, resolvedType, null));
             model.addAttribute("lat", loc.latitude());
             model.addAttribute("lon", loc.longitude());
         }
@@ -61,10 +63,10 @@ public class BookingWebController {
 
     @GetMapping("/bookings")
     public String bookings(@RequestParam(required = false) Long userId, Model model) {
-        if (userId != null) {
-            model.addAttribute("bookings",
-                    service.findByUser(userId).stream().map(BookingDto::from).toList());
-        }
+        List<BookingDto> bookings = userId != null
+                ? service.findByUser(userId).stream().map(BookingDto::from).toList()
+                : service.findAll().stream().map(BookingDto::from).toList();
+        model.addAttribute("bookings", bookings);
         model.addAttribute("userId", userId);
         return "bookings";
     }
@@ -92,6 +94,8 @@ public class BookingWebController {
             service.endBooking(id, simulateEndTelemetry(booking));
         } catch (DomainException e) {
             ra.addFlashAttribute("error", e.getMessage());
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", "Could not end ride: " + e.getMessage());
         }
         return "redirect:/ui/bookings/" + id;
     }

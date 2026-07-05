@@ -32,8 +32,8 @@
     <section class="panel">
         <h2>Filter by User</h2>
         <form method="get" th:action="@{/ui/bookings}" class="form-grid">
-            <label>User ID
-                <input type="number" id="userId" name="userId" th:value="${userId}" placeholder="1">
+            <label>User ID (leave empty for all)
+                <input type="number" id="userId" name="userId" th:value="${userId}" placeholder="e.g. 1">
             </label>
             <label>&nbsp;
                 <button type="submit">Show</button>
@@ -41,18 +41,19 @@
         </form>
     </section>
 
-    <section class="panel" th:if="${bookings != null}">
+    <section class="panel">
         <h2>Bookings</h2>
         <div class="table-wrap">
             <table>
                 <thead>
                 <tr>
-                    <th>ID</th><th>Vehicle</th><th>Type</th><th>Start Time</th><th>Status</th><th></th>
+                    <th>ID</th><th>User</th><th>Vehicle</th><th>Type</th><th>Start Time</th><th>Status</th><th></th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="b : ${bookings}">
                     <td th:text="${b.bookingId()}">1</td>
+                    <td th:text="${b.userId()}">1</td>
                     <td th:text="${b.vehicleId()}">1</td>
                     <td th:text="${b.vehicleType()}">E_SCOOTER</td>
                     <td th:text="${b.startTime()}">2026-06-09T10:00</td>
@@ -67,7 +68,7 @@
                     </td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(bookings)}">
-                    <td colspan="6" class="text-muted">No bookings for this user.</td>
+                    <td colspan="7" class="text-muted">No bookings found.</td>
                 </tr>
                 </tbody>
             </table>
