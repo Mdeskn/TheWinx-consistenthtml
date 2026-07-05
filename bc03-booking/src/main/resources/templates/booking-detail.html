@@ -9,6 +9,15 @@
 <body>
 <main class="container">
 
+    <nav class="site-nav">
+        <a class="site-nav-brand" href="http://localhost:8081/">TheWinx</a>
+        <a href="http://localhost:8081/">Identity</a>
+        <a href="http://localhost:8082/list.html">Fleet</a>
+        <a class="current" href="http://localhost:8083/ui/search">Booking</a>
+        <a href="http://localhost:8084/payments">Payments</a>
+        <a href="http://localhost:8085/ratings">Ratings</a>
+    </nav>
+
     <header class="topbar">
         <div class="topbar-brand">
             <span class="badge-bc">BC-03</span>
@@ -21,10 +30,10 @@
     </header>
 
     <section class="panel hero">
-        <div>
+        <hgroup>
             <p class="eyebrow">Booking Detail</p>
             <h1>Booking #<span th:text="${booking.bookingId()}">1</span></h1>
-        </div>
+        </hgroup>
         <nav class="link-group">
             <a class="link-button secondary-button"
                th:href="@{/ui/bookings(userId=${booking.userId()})}">← My Bookings</a>
@@ -85,14 +94,14 @@
 
     <section class="panel" th:if="${booking.status() == 'ACTIVE'}">
         <h2>Actions</h2>
-        <div class="btn-row">
+        <nav class="btn-row">
             <form method="post" th:action="@{/ui/bookings/{id}/end(id=${booking.bookingId()})}">
                 <button type="submit">End Ride</button>
             </form>
             <form method="post" th:action="@{/ui/bookings/{id}/cancel(id=${booking.bookingId()})}">
                 <button class="danger-button" type="submit">Cancel Booking</button>
             </form>
-        </div>
+        </nav>
         <p class="text-muted" style="margin-top:.5rem;">End location &amp; distance are captured automatically (simulated device telemetry).</p>
     </section>
 

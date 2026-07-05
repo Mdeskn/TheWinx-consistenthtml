@@ -7,10 +7,19 @@
     <link rel="stylesheet" href="http://localhost:8080/styles.css">
 </head>
 <body>
-<div class="container">
+<main class="container">
 
-    <div class="panel hero">
-        <div>
+    <nav class="site-nav">
+        <a class="site-nav-brand" href="http://localhost:8081/">TheWinx</a>
+        <a href="http://localhost:8081/">Identity</a>
+        <a href="http://localhost:8082/list.html">Fleet</a>
+        <a href="http://localhost:8083/ui/search">Booking</a>
+        <a href="http://localhost:8084/payments">Payments</a>
+        <a class="current" href="http://localhost:8085/ratings">Ratings</a>
+    </nav>
+
+    <header class="panel hero">
+        <hgroup>
             <p class="eyebrow">BC-05 Rating</p>
             <h1>Rating #<span th:text="${rating.ratingId}"></span></h1>
             <p class="subtitle">
@@ -18,17 +27,17 @@
                 by User #<span th:text="${rating.userId}"></span>
                 on <span th:text="${#temporals.format(rating.createdAt, 'dd MMM yyyy, HH:mm')}"></span>.
             </p>
-        </div>
-        <div class="link-group">
+        </hgroup>
+        <nav class="link-group">
             <a class="link-button secondary-button" th:href="@{/ratings}">← All Ratings</a>
             <a class="link-button secondary-button"
                th:href="@{/ratings/vehicle/{id}(id=${rating.vehicleId})}">Vehicle Ratings</a>
             <a class="link-button secondary-button"
                th:href="@{/ratings/provider/{id}(id=${rating.providerId})}">Provider Ratings</a>
-        </div>
-    </div>
+        </nav>
+    </header>
 
-    <div class="panel">
+    <section class="panel">
         <h2>Scores</h2>
         <div class="detail-grid">
             <span class="detail-label">Vehicle</span>
@@ -62,9 +71,9 @@
             <span class="detail-value text-muted"
                   th:if="${rating.comment == null or rating.comment.isEmpty()}">No comment left.</span>
         </div>
-    </div>
+    </section>
 
-    <div class="panel">
+    <section class="panel">
         <h2>Reference IDs</h2>
         <div class="detail-grid">
             <span class="detail-label">Rating ID</span>
@@ -86,8 +95,8 @@
             <span class="detail-value"
                   th:text="${#temporals.format(rating.createdAt, 'yyyy-MM-dd HH:mm:ss')}"></span>
         </div>
-    </div>
+    </section>
 
-</div>
+</main>
 </body>
 </html>

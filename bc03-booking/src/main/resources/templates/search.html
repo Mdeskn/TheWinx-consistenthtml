@@ -9,6 +9,15 @@
 <body>
 <main class="container">
 
+    <nav class="site-nav">
+        <a class="site-nav-brand" href="http://localhost:8081/">TheWinx</a>
+        <a href="http://localhost:8081/">Identity</a>
+        <a href="http://localhost:8082/list.html">Fleet</a>
+        <a class="current" href="http://localhost:8083/ui/search">Booking</a>
+        <a href="http://localhost:8084/payments">Payments</a>
+        <a href="http://localhost:8085/ratings">Ratings</a>
+    </nav>
+
     <header class="topbar">
         <div class="topbar-brand">
             <span class="badge-bc">BC-03</span>
@@ -21,10 +30,10 @@
     </header>
 
     <section class="hero-banner">
-        <div>
+        <hgroup>
             <h2>Search Available Vehicles</h2>
             <p>Find vehicles near you and book instantly.</p>
-        </div>
+        </hgroup>
         <span class="hero-icon" aria-hidden="true">🔍</span>
     </section>
 
@@ -52,9 +61,9 @@
             <label>Auth Token
                 <input type="text" id="token" name="token" th:value="${token}" placeholder="X-Auth-Token">
             </label>
-            <div class="form-full btn-row">
+            <nav class="form-full btn-row">
                 <button type="submit">Search</button>
-            </div>
+            </nav>
         </form>
     </section>
 

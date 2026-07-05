@@ -7,43 +7,45 @@
     <link rel="stylesheet" href="http://localhost:8080/styles.css">
 </head>
 <body>
-<div class="container">
+<main class="container">
 
-    <div class="panel hero">
-        <div>
+    <nav class="site-nav">
+        <a class="site-nav-brand" href="http://localhost:8081/">TheWinx</a>
+        <a href="http://localhost:8081/">Identity</a>
+        <a href="http://localhost:8082/list.html">Fleet</a>
+        <a href="http://localhost:8083/ui/search">Booking</a>
+        <a href="http://localhost:8084/payments">Payments</a>
+        <a class="current" href="http://localhost:8085/ratings">Ratings</a>
+    </nav>
+
+    <header class="panel hero">
+        <hgroup>
             <p class="eyebrow">BC-05 Rating</p>
             <h1 th:text="${filter != null ? filter : 'All Ratings'}">All Ratings</h1>
             <p class="subtitle">Browse and filter ratings left by users after completed bookings.</p>
-        </div>
-        <div class="link-group">
+        </hgroup>
+        <nav class="link-group">
             <a class="link-button" th:href="@{/ratings/submit}">+ Submit Rating</a>
             <a class="link-button secondary-button" th:href="@{/ratings}">All Ratings</a>
-        </div>
-    </div>
+        </nav>
+    </header>
 
-    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <p th:if="${success}" class="alert alert-success" th:text="${success}"></p>
 
-    <div th:if="${averageScore != null}" class="alert alert-info">
+    <p th:if="${averageScore != null}" class="alert alert-info">
         Average vehicle score for this filter:
         <strong th:text="${#numbers.formatDecimal(averageScore, 1, 2)} + ' / 5'"></strong>
-    </div>
+    </p>
 
-    <div class="panel" th:if="${not #lists.isEmpty(ratings)}">
+    <section class="panel" th:if="${not #lists.isEmpty(ratings)}">
         <h2>Ratings</h2>
         <div class="table-wrap">
             <table>
                 <thead>
                 <tr>
-                    <th>#</th>
-                    <th>Booking</th>
-                    <th>User</th>
-                    <th>Vehicle</th>
-                    <th>Vehicle Score</th>
-                    <th>Provider</th>
-                    <th>Provider Score</th>
-                    <th>Comment</th>
-                    <th>Date</th>
-                    <th></th>
+                    <th>#</th><th>Booking</th><th>User</th><th>Vehicle</th>
+                    <th>Vehicle Score</th><th>Provider</th><th>Provider Score</th>
+                    <th>Comment</th><th>Date</th><th></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -85,13 +87,13 @@
                 </tbody>
             </table>
         </div>
-    </div>
+    </section>
 
-    <div class="panel empty-state" th:if="${#lists.isEmpty(ratings)}">
+    <section class="panel empty-state" th:if="${#lists.isEmpty(ratings)}">
         <p>No ratings found.</p>
         <a th:href="@{/ratings/submit}" class="link-button">Submit the first rating</a>
-    </div>
+    </section>
 
-</div>
+</main>
 </body>
 </html>

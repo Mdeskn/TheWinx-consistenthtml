@@ -244,6 +244,44 @@ a { color: inherit; }
     align-items: start;
 }
 
+/* ── Site-wide navigation bar ────────────────────────────────── */
+.site-nav {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: .55rem 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: .3rem;
+    box-shadow: 0 4px 14px rgba(17,34,64,.06);
+    flex-wrap: wrap;
+}
+
+.site-nav-brand {
+    font-family: "Space Grotesk", sans-serif;
+    font-weight: 700;
+    font-size: .95rem;
+    color: var(--blue);
+    text-decoration: none;
+    padding: .2rem .8rem .2rem 0;
+    border-right: 1px solid var(--line);
+    margin-right: .4rem;
+    white-space: nowrap;
+}
+
+.site-nav a {
+    font-size: .84rem;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    padding: .25rem .65rem;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+.site-nav a:hover  { background: var(--bg); color: var(--blue); }
+.site-nav a.current { background: #e8f2fb; color: var(--blue); font-weight: 600; }
+
 /* ── App shell topbar ────────────────────────────────────────── */
 .topbar {
     background: #fff;

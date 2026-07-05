@@ -23,7 +23,7 @@
                 <a href="/ui/register">Register</a>
             </nav>
 
-            <div th:if="${error}" class="alert alert-danger" th:text="${error}" style="margin-top:1rem;"></div>
+            <p th:if="${error}" class="alert alert-danger" th:text="${error}" style="margin-top:1rem;"></p>
 
             <form class="auth-form" action="/ui/login" method="post">
                 <input class="form-control" type="text" name="username" placeholder="Username or e-mail" required>

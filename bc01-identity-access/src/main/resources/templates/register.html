@@ -23,7 +23,7 @@
                 <a class="active" href="/ui/register">Register</a>
             </nav>
 
-            <div th:if="${error}" class="alert alert-danger" th:text="${error}" style="margin-top:1rem;"></div>
+            <p th:if="${error}" class="alert alert-danger" th:text="${error}" style="margin-top:1rem;"></p>
 
             <form id="registerForm" class="auth-form" action="/ui/users" method="post" novalidate>
 

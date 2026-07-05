@@ -9,6 +9,15 @@
 <body>
 <main class="container">
 
+    <nav class="site-nav">
+        <a class="site-nav-brand" href="http://localhost:8081/">TheWinx</a>
+        <a class="current" href="http://localhost:8081/">Identity</a>
+        <a href="http://localhost:8082/list.html">Fleet</a>
+        <a href="http://localhost:8083/ui/search">Booking</a>
+        <a href="http://localhost:8084/payments">Payments</a>
+        <a href="http://localhost:8085/ratings">Ratings</a>
+    </nav>
+
     <header class="topbar">
         <div class="topbar-brand">
             <span class="badge-bc">User Portal</span>
@@ -18,14 +27,14 @@
     </header>
 
     <section class="hero-banner">
-        <div>
+        <hgroup>
             <h2>Browse &amp; Book Vehicles</h2>
             <p>Find the right vehicle for your trip and book it in seconds.</p>
-        </div>
+        </hgroup>
         <span class="hero-icon" aria-hidden="true">🚗</span>
     </section>
 
-    <div class="stats-strip">
+    <section class="stats-strip">
         <article class="stat-card">
             <span class="stat-label">Available Now</span>
             <span class="stat-value" id="stat-available" th:text="${statAvailable}">–</span>
@@ -46,7 +55,7 @@
             <span class="stat-value" id="stat-completed" th:text="${statCompleted}">–</span>
             <span class="stat-sub">past trips</span>
         </article>
-    </div>
+    </section>
 
     <section class="section-panel">
         <h3><span class="dot"></span>Available Vehicles</h3>
@@ -66,21 +75,21 @@
             </select>
         </div>
         <div class="vehicle-grid" id="vehicleGrid">
-            <div th:each="v : ${vehicles}" class="vehicle-card" th:data-id="${v.id}">
-                <div class="vehicle-card-img" th:text="${v.icon}">🚗</div>
+            <article th:each="v : ${vehicles}" class="vehicle-card" th:data-id="${v.id}">
+                <figure class="vehicle-card-img" th:text="${v.icon}">🚗</figure>
                 <div class="vehicle-card-body">
                     <h4 th:text="${v.name}">Vehicle Name</h4>
                     <p class="vehicle-card-meta" th:text="${v.type} + ' · ' + ${v.seats} + ' seats · ' + ${v.plate}">Type · Seats · Plate</p>
-                    <div class="vehicle-card-footer">
+                    <footer class="vehicle-card-footer">
                         <span class="price-tag" th:text="'EUR ' + ${v.pricePerDay} + '/day'">EUR 0.0/day</span>
                         <span class="availability-badge" th:classappend="${v.available} ? 'avail-yes' : 'avail-no'"
                               th:text="${v.available} ? 'Available' : 'Booked'">Available</span>
-                    </div>
+                    </footer>
                     <button class="btn-book" th:disabled="${!v.available}"
                             th:onclick="'openBookModal(' + ${v.id} + ')'"
                             th:text="${v.available} ? 'Book Now' : 'Unavailable'">Book Now</button>
                 </div>
-            </div>
+            </article>
         </div>
         <p id="noResults" th:style="${#lists.isEmpty(vehicles)} ? '' : 'display:none'"
            class="subtitle">No vehicles match your filters.</p>
@@ -128,7 +137,6 @@
 
 </main>
 
-<!-- Booking dialog -->
 <dialog id="bookModal">
     <h2>Book Vehicle</h2>
     <p id="bookVehicleInfo" class="subtitle"></p>
@@ -139,18 +147,17 @@
             <textarea id="bookNotes" placeholder="Any special requirements…"></textarea>
         </label>
     </div>
-    <div class="dialog-actions">
+    <nav class="dialog-actions">
         <button class="secondary-button" type="button" onclick="document.getElementById('bookModal').close()">Cancel</button>
         <button type="button" onclick="confirmBooking()">Confirm Booking</button>
-    </div>
+    </nav>
 </dialog>
 
-<!-- Toast notification -->
-<div class="toast-wrap">
+<aside class="toast-wrap">
     <div id="bookToast" class="toast">
         <span id="toastMsg"></span>
     </div>
-</div>
+</aside>
 
 <script th:inline="javascript">
 const API_BASE = "/api/v1/identity/fleet";

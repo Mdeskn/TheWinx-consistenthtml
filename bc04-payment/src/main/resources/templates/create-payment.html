@@ -1,13 +1,24 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="http://localhost:8080/styles.css">
     <title>Create Payment</title>
 </head>
-
 <body>
-<div class="container">
-    <div class="panel">
+<main class="container">
+
+    <nav class="site-nav">
+        <a class="site-nav-brand" href="http://localhost:8081/">TheWinx</a>
+        <a href="http://localhost:8081/">Identity</a>
+        <a href="http://localhost:8082/list.html">Fleet</a>
+        <a href="http://localhost:8083/ui/search">Booking</a>
+        <a class="current" href="http://localhost:8084/payments">Payments</a>
+        <a href="http://localhost:8085/ratings">Ratings</a>
+    </nav>
+
+    <section class="panel">
         <p class="eyebrow">BC-04</p>
         <h1>Create Payment</h1>
         <p>Booking data is mocked here by manually entering booking ID, user ID, and amount.</p>
@@ -16,34 +27,26 @@
             <label>Booking ID
                 <input type="number" name="bookingId" value="1001" required>
             </label>
-
             <label>User ID
                 <input type="number" name="userId" value="501" required>
             </label>
-
             <label>Amount
                 <input type="number" step="0.01" name="amount" value="29.99" required>
             </label>
-
             <label>Currency
                 <input type="text" name="currency" value="EUR" required>
             </label>
-
             <label>Payment Method
                 <select name="paymentMethod">
-                    <option th:each="method : ${paymentMethods}"
-                            th:value="${method}"
-                            th:text="${method}">
-                    </option>
+                    <option th:each="method : ${paymentMethods}" th:value="${method}" th:text="${method}"></option>
                 </select>
             </label>
-
-            <div class="form-full btn-row">
+            <nav class="form-full btn-row">
                 <button type="submit">Process Payment</button>
                 <a class="link-button secondary-button" href="/payments">Back to Payments</a>
-            </div>
+            </nav>
         </form>
-    </div>
-</div>
+    </section>
+</main>
 </body>
 </html>

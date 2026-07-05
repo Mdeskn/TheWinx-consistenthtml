@@ -9,6 +9,15 @@
 <body>
 <main class="container">
 
+    <nav class="site-nav">
+        <a class="site-nav-brand" href="http://localhost:8081/">TheWinx</a>
+        <a href="http://localhost:8081/">Identity</a>
+        <a class="current" href="http://localhost:8082/list.html">Fleet</a>
+        <a href="http://localhost:8083/ui/search">Booking</a>
+        <a href="http://localhost:8084/payments">Payments</a>
+        <a href="http://localhost:8085/ratings">Ratings</a>
+    </nav>
+
     <header class="topbar">
         <div class="topbar-brand">
             <span class="badge-bc">BC-02</span>
@@ -22,14 +31,14 @@
     </header>
 
     <section class="hero-banner">
-        <div>
+        <hgroup>
             <h2>Provider Fleet Dashboard</h2>
             <p>View vehicles, prices, availability, restrictions, and billing data.</p>
-        </div>
+        </hgroup>
         <span class="hero-icon" aria-hidden="true">🚗</span>
     </section>
 
-    <div class="stats-strip">
+    <section class="stats-strip">
         <article class="stat-card">
             <span class="stat-label">Total Vehicles</span>
             <span class="stat-value" id="totalVehicles">0</span>
@@ -42,7 +51,7 @@
             <span class="stat-label">Booked</span>
             <span class="stat-value" id="bookedVehicles">0</span>
         </article>
-    </div>
+    </section>
 
     <section class="section-panel">
         <h3><span class="dot"></span>Vehicle List</h3>

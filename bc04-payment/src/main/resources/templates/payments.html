@@ -1,36 +1,39 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="http://localhost:8080/styles.css">
     <title>Payments</title>
 </head>
-
 <body>
-<div class="container">
-    <div class="panel">
+<main class="container">
+
+    <nav class="site-nav">
+        <a class="site-nav-brand" href="http://localhost:8081/">TheWinx</a>
+        <a href="http://localhost:8081/">Identity</a>
+        <a href="http://localhost:8082/list.html">Fleet</a>
+        <a href="http://localhost:8083/ui/search">Booking</a>
+        <a class="current" href="http://localhost:8084/payments">Payments</a>
+        <a href="http://localhost:8085/ratings">Ratings</a>
+    </nav>
+
+    <section class="panel">
         <p class="eyebrow">BC-04</p>
         <h1>Payment Microservice</h1>
         <p>This UI demonstrates the Payment bounded context as an independent microservice.</p>
         <a class="link-button" href="/payments/new">+ Create New Payment</a>
-    </div>
+    </section>
 
-    <div class="panel">
+    <section class="panel">
         <div class="table-wrap">
             <table>
                 <thead>
                 <tr>
-                    <th>Payment ID</th>
-                    <th>Booking ID</th>
-                    <th>User ID</th>
-                    <th>Amount</th>
-                    <th>Currency</th>
-                    <th>Method</th>
-                    <th>Status</th>
-                    <th>Paid At</th>
-                    <th>Failure Reason</th>
+                    <th>Payment ID</th><th>Booking ID</th><th>User ID</th><th>Amount</th>
+                    <th>Currency</th><th>Method</th><th>Status</th><th>Paid At</th><th>Failure Reason</th>
                 </tr>
                 </thead>
-
                 <tbody>
                 <tr th:each="payment : ${payments}">
                     <td th:text="${payment.paymentId}"></td>
@@ -49,7 +52,7 @@
                 </tbody>
             </table>
         </div>
-    </div>
-</div>
+    </section>
+</main>
 </body>
 </html>

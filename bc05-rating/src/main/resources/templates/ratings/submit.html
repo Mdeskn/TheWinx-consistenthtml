@@ -7,22 +7,31 @@
     <link rel="stylesheet" href="http://localhost:8080/styles.css">
 </head>
 <body>
-<div class="container">
+<main class="container">
 
-    <div class="panel hero">
-        <div>
+    <nav class="site-nav">
+        <a class="site-nav-brand" href="http://localhost:8081/">TheWinx</a>
+        <a href="http://localhost:8081/">Identity</a>
+        <a href="http://localhost:8082/list.html">Fleet</a>
+        <a href="http://localhost:8083/ui/search">Booking</a>
+        <a href="http://localhost:8084/payments">Payments</a>
+        <a class="current" href="http://localhost:8085/ratings">Ratings</a>
+    </nav>
+
+    <header class="panel hero">
+        <hgroup>
             <p class="eyebrow">BC-05 Rating</p>
             <h1>Submit a Rating</h1>
             <p class="subtitle">Rate your vehicle and provider after a completed booking. Each booking can only be rated once.</p>
-        </div>
-        <div class="link-group">
+        </hgroup>
+        <nav class="link-group">
             <a class="link-button secondary-button" th:href="@{/ratings}">← All Ratings</a>
-        </div>
-    </div>
+        </nav>
+    </header>
 
-    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+    <p th:if="${error}" class="alert alert-danger" th:text="${error}"></p>
 
-    <div class="panel">
+    <section class="panel">
         <h2>Rating Details</h2>
         <form th:action="@{/ratings/submit}" th:object="${form}" method="post" novalidate>
 
@@ -70,14 +79,14 @@
                 <textarea th:field="*{comment}" placeholder="Share your experience..."></textarea>
             </label>
 
-            <div class="form-full btn-row">
+            <nav class="form-full btn-row">
                 <button type="submit">Submit Rating</button>
                 <a class="link-button secondary-button" th:href="@{/ratings}">Cancel</a>
-            </div>
+            </nav>
 
         </form>
-    </div>
+    </section>
 
-</div>
+</main>
 </body>
 </html>
