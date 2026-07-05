@@ -5,6 +5,7 @@ import com.winx.booking.api.dto.VehicleDto;
 import com.winx.booking.exception.DependencyUnavailableException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ import java.util.List;
 @Component
 @Profile("!mock")
 @RequiredArgsConstructor
+@Slf4j
 public class RealFleetGateway implements FleetGateway {
 
     private final FleetClient client;
@@ -55,6 +57,7 @@ public class RealFleetGateway implements FleetGateway {
 
     @SuppressWarnings("unused")
     private void statusUpdateFailed(Long vehicleId, Throwable t) {
-        throw new DependencyUnavailableException("Fleet status update failed", t);
+        log.warn("Fleet status update failed for vehicle {}; proceeding without sync. Reason: {}",
+                vehicleId, t.getMessage());
     }
 }
