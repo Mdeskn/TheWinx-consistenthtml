@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Fleet Management</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fleet Management – Vehicles</title>
     <link rel="stylesheet" href="http://localhost:8080/styles.css">
 </head>
 <body>
-
-<div class="fleet-shell">
+<main class="container">
 
     <header class="topbar">
         <div class="topbar-brand">
@@ -23,37 +24,34 @@
     <section class="hero-banner">
         <div>
             <h2>Provider Fleet Dashboard</h2>
-            <p>View vehicles, prices, availability, restrictions, and daily billing data.</p>
+            <p>View vehicles, prices, availability, restrictions, and billing data.</p>
         </div>
-        <div class="hero-icon">Fleet</div>
+        <span class="hero-icon" aria-hidden="true">🚗</span>
     </section>
 
-    <section class="stats-strip">
-        <div class="stat-card">
+    <div class="stats-strip">
+        <article class="stat-card">
             <span class="stat-label">Total Vehicles</span>
             <span class="stat-value" id="totalVehicles">0</span>
-        </div>
-        <div class="stat-card">
+        </article>
+        <article class="stat-card">
             <span class="stat-label">Available</span>
             <span class="stat-value" id="availableVehicles">0</span>
-        </div>
-        <div class="stat-card">
+        </article>
+        <article class="stat-card">
             <span class="stat-label">Booked</span>
             <span class="stat-value" id="bookedVehicles">0</span>
-        </div>
-    </section>
+        </article>
+    </div>
 
     <section class="section-panel">
         <h3><span class="dot"></span>Vehicle List</h3>
 
-        <div class="form-grid" style="margin-bottom: 1rem;">
-            <label>
-                Provider ID
+        <div class="form-grid" style="margin-bottom:1rem;">
+            <label>Provider ID
                 <input type="number" id="providerId" value="1">
             </label>
-
-            <label>
-                Filter by Type
+            <label>Filter by Type
                 <select id="typeFilter">
                     <option value="">All Types</option>
                     <option value="E_SCOOTER">E-Scooter</option>
@@ -62,19 +60,15 @@
                     <option value="E_CAR">E-Car</option>
                 </select>
             </label>
-
-            <label>
-                Filter by Status
+            <label>Filter by Status
                 <select id="statusFilter">
                     <option value="">All Status</option>
                     <option value="AVAILABLE">Available</option>
                     <option value="BOOKED">Booked</option>
                 </select>
             </label>
-
-            <label>
-                &nbsp;
-                <button onclick="loadVehicles()">Refresh</button>
+            <label>&nbsp;
+                <button type="button" onclick="loadVehicles()">Refresh</button>
             </label>
         </div>
 
@@ -82,15 +76,8 @@
             <table id="vehicleTable">
                 <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                    <th>Status</th>
-                    <th>Price / Day</th>
-                    <th>Billing</th>
-                    <th>Restrictions</th>
-                    <th>Action</th>
+                    <th>ID</th><th>Name</th><th>Type</th><th>Description</th>
+                    <th>Status</th><th>Price / Day</th><th>Billing</th><th>Restrictions</th><th>Action</th>
                 </tr>
                 </thead>
                 <tbody id="vehicleTableBody"></tbody>
@@ -100,14 +87,12 @@
         <p id="message" class="message"></p>
     </section>
 
-</div>
-
+</main>
 <script>
 let vehicles = [];
 
 document.addEventListener("DOMContentLoaded", () => {
     loadVehicles();
-
     document.getElementById("typeFilter").addEventListener("change", renderVehicles);
     document.getElementById("statusFilter").addEventListener("change", renderVehicles);
 });
@@ -115,117 +100,75 @@ document.addEventListener("DOMContentLoaded", () => {
 async function loadVehicles() {
     const providerId = document.getElementById("providerId").value || 1;
     const message = document.getElementById("message");
-
     try {
         const response = await fetch(`http://localhost:8082/providers/${providerId}/vehicles`);
-
-        if (!response.ok) {
-            throw new Error("Could not load vehicles");
-        }
-
+        if (!response.ok) throw new Error();
         vehicles = await response.json();
         renderVehicles();
         message.textContent = "";
-    } catch (error) {
+    } catch {
         message.textContent = "Could not load vehicles. Please make sure the Fleet service is running.";
         message.className = "message error";
     }
 }
 
 function renderVehicles() {
-    const tbody = document.getElementById("vehicleTableBody");
+    const tbody      = document.getElementById("vehicleTableBody");
     const typeFilter = document.getElementById("typeFilter").value;
-    const statusFilter = document.getElementById("statusFilter").value;
+    const statFilter = document.getElementById("statusFilter").value;
 
-    let filtered = vehicles;
-
-    if (typeFilter) {
-        filtered = filtered.filter(v => v.type === typeFilter);
-    }
-
-    if (statusFilter) {
-        filtered = filtered.filter(v => v.status === statusFilter);
-    }
+    let filtered = vehicles
+        .filter(v => !typeFilter || v.type === typeFilter)
+        .filter(v => !statFilter || v.status === statFilter);
 
     tbody.innerHTML = "";
-
     filtered.forEach(v => {
+        const statusClass  = v.status === "AVAILABLE" ? "status-available" : "status-booked";
+        const nextStatus   = v.status === "AVAILABLE" ? "BOOKED" : "AVAILABLE";
+        const buttonText   = v.status === "AVAILABLE" ? "Mark Booked" : "Mark Available";
         const row = document.createElement("tr");
-        const statusClass = v.status === "AVAILABLE" ? "status-available" : "status-booked";
-        const nextStatus = v.status === "AVAILABLE" ? "BOOKED" : "AVAILABLE";
-        const buttonText = v.status === "AVAILABLE" ? "Mark Booked" : "Mark Available";
-
         row.innerHTML = `
             <td>${v.id}</td>
-            <td><strong>${v.name || "-"}</strong></td>
+            <td><strong>${v.name || "—"}</strong></td>
             <td>${v.type}</td>
-            <td>${v.description || "-"}</td>
-            <td><span class="status-pill ${statusClass}">${v.status}</span></td>
+            <td>${v.description || "—"}</td>
+            <td><span class="status ${statusClass}">${v.status}</span></td>
             <td>EUR ${v.pricePerUnit}</td>
             <td>${v.billingModel}</td>
+            <td>${v.maxDurationMinutes || "—"} min, ${v.maxKilometers || "—"} km, min age ${v.minAge || "—"}, ${v.maxPersons || "—"} persons</td>
             <td>
-                ${v.maxDurationMinutes || "-"} min,
-                ${v.maxKilometers || "-"} km,
-                min age ${v.minAge || "-"},
-                ${v.maxPersons || "-"} persons
-            </td>
-            <td>
-                <button class="secondary-btn" data-id="${v.id}" data-status="${nextStatus}">
-                    ${buttonText}
-                </button>
-                <button style="margin-left: .4rem; background: #b93333;" data-delete-id="${v.id}">
-                    Delete
-                </button>
-            </td>
-        `;
-
+                <button class="secondary-button" data-id="${v.id}" data-status="${nextStatus}">${buttonText}</button>
+                <button class="danger-button" data-delete-id="${v.id}" style="margin-left:.4rem">Delete</button>
+            </td>`;
         tbody.appendChild(row);
     });
 
-    document.querySelectorAll("[data-id]").forEach(button => {
-        button.addEventListener("click", () => {
-            const id = button.getAttribute("data-id");
-            const status = button.getAttribute("data-status");
-            updateStatus(id, status);
-        });
-    });
-
-    document.querySelectorAll("[data-delete-id]").forEach(button => {
-        button.addEventListener("click", () => {
-            const id = button.getAttribute("data-delete-id");
-            deleteVehicle(id);
-        });
-    });
+    document.querySelectorAll("[data-id]").forEach(btn =>
+        btn.addEventListener("click", () => updateStatus(btn.dataset.id, btn.dataset.status)));
+    document.querySelectorAll("[data-delete-id]").forEach(btn =>
+        btn.addEventListener("click", () => deleteVehicle(btn.dataset.deleteId)));
 
     updateStats();
 }
 
 function updateStats() {
-    document.getElementById("totalVehicles").textContent = vehicles.length;
-    document.getElementById("availableVehicles").textContent =
-        vehicles.filter(v => v.status === "AVAILABLE").length;
-    document.getElementById("bookedVehicles").textContent =
-        vehicles.filter(v => v.status === "BOOKED").length;
+    document.getElementById("totalVehicles").textContent     = vehicles.length;
+    document.getElementById("availableVehicles").textContent = vehicles.filter(v => v.status === "AVAILABLE").length;
+    document.getElementById("bookedVehicles").textContent    = vehicles.filter(v => v.status === "BOOKED").length;
 }
 
 async function updateStatus(id, newStatus) {
     const message = document.getElementById("message");
-
     try {
-        const response = await fetch(`http://localhost:8082/providers/vehicles/${id}/status`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
+        const r = await fetch(`http://localhost:8082/providers/vehicles/${id}/status`, {
+            method: "PATCH", headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ status: newStatus })
         });
-
-        if (!response.ok) {
-            throw new Error("Status update failed");
-        }
-
+        if (!r.ok) throw new Error();
         await loadVehicles();
-        message.textContent = "Vehicle status updated successfully.";
+        message.textContent = "Vehicle status updated.";
         message.className = "message success";
-    } catch (error) {
+    } catch {
         message.textContent = "Could not update vehicle status.";
         message.className = "message error";
     }
@@ -233,29 +176,18 @@ async function updateStatus(id, newStatus) {
 
 async function deleteVehicle(id) {
     const message = document.getElementById("message");
-
-    if (!confirm("Delete this vehicle?")) {
-        return;
-    }
-
+    if (!confirm("Delete this vehicle?")) return;
     try {
-        const response = await fetch(`http://localhost:8082/providers/vehicles/${id}`, {
-            method: "DELETE"
-        });
-
-        if (!response.ok) {
-            throw new Error("Delete failed");
-        }
-
+        const r = await fetch(`http://localhost:8082/providers/vehicles/${id}`, { method: "DELETE" });
+        if (!r.ok) throw new Error();
         await loadVehicles();
-        message.textContent = "Vehicle deleted successfully.";
+        message.textContent = "Vehicle deleted.";
         message.className = "message success";
-    } catch (error) {
+    } catch {
         message.textContent = "Could not delete vehicle.";
         message.className = "message error";
     }
 }
 </script>
-
 </body>
 </html>

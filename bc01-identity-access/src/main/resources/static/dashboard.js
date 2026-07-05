@@ -17,14 +17,8 @@ async function refreshData() {
             fetch(`${API_BASE}/vehicles`),
             fetch(`${API_BASE}/bookings?username=${encodeURIComponent(currentUsername)}`)
         ]);
-
-        if (vehicleRes.ok) {
-            vehicles = await vehicleRes.json();
-        }
-        if (bookingRes.ok) {
-            myBookings = await bookingRes.json();
-        }
-
+        if (vehicleRes.ok) vehicles = await vehicleRes.json();
+        if (bookingRes.ok) myBookings = await bookingRes.json();
         filterVehicles();
         updateStats();
         renderBookings();
@@ -33,7 +27,6 @@ async function refreshData() {
     }
 }
 
-// ── Render vehicle cards ────────────────────────────────────────
 function renderVehicles(list) {
     const grid = document.getElementById("vehicleGrid");
     const noResults = document.getElementById("noResults");
@@ -68,10 +61,9 @@ function renderVehicles(list) {
     });
 }
 
-// ── Filter ─────────────────────────────────────────────────────
 function filterVehicles() {
     const searchInput = document.getElementById("searchInput");
-    const typeFilter = document.getElementById("typeFilter");
+    const typeFilter  = document.getElementById("typeFilter");
     const availFilter = document.getElementById("availFilter");
     if (!searchInput || !typeFilter || !availFilter) return;
 
@@ -87,21 +79,20 @@ function filterVehicles() {
     renderVehicles(filtered);
 }
 
-// ── Booking modal ──────────────────────────────────────────────
 function openBookModal(vehicleId) {
     selectedVehicleId = vehicleId;
     const v = vehicles.find(x => x.id === vehicleId);
     if (!v) return;
     const bookVehicleInfo = document.getElementById("bookVehicleInfo");
-    const pickupDate = document.getElementById("pickupDate");
-    const returnDate = document.getElementById("returnDate");
-    const bookNotes = document.getElementById("bookNotes");
+    const pickupDate      = document.getElementById("pickupDate");
+    const returnDate      = document.getElementById("returnDate");
+    const bookNotes       = document.getElementById("bookNotes");
 
     if (bookVehicleInfo) bookVehicleInfo.textContent = `${v.name} (${v.plate}) — EUR ${v.pricePerDay}/day`;
     if (pickupDate) pickupDate.value = "";
     if (returnDate) returnDate.value = "";
-    if (bookNotes) bookNotes.value = "";
-    new bootstrap.Modal(document.getElementById("bookModal")).show();
+    if (bookNotes)  bookNotes.value  = "";
+    document.getElementById("bookModal").showModal();
 }
 
 async function confirmBooking() {
@@ -117,25 +108,16 @@ async function confirmBooking() {
     const response = await fetch(`${API_BASE}/bookings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            vehicleId: selectedVehicleId,
-            username: currentUsername,
-            pickupDate: pickup,
-            returnDate: ret
-        })
+        body: JSON.stringify({ vehicleId: selectedVehicleId, username: currentUsername, pickupDate: pickup, returnDate: ret })
     });
 
-    if (!response.ok) {
-        alert("Unable to complete booking. Please try another vehicle.");
-        return;
-    }
+    if (!response.ok) { alert("Unable to complete booking. Please try another vehicle."); return; }
 
     const booking = await response.json();
     await refreshData();
 
     const v = vehicles.find(x => x.id === booking.vehicleId);
-
-    bootstrap.Modal.getInstance(document.getElementById("bookModal")).hide();
+    document.getElementById("bookModal").close();
     showToast(`${v ? v.name : "Vehicle"} booked from ${pickup} to ${ret}!`);
 }
 
@@ -143,16 +125,12 @@ async function cancelBooking(bookingId) {
     if (!confirm("Cancel this booking?")) return;
 
     const response = await fetch(`${API_BASE}/bookings/${bookingId}/cancel`, { method: "POST" });
-    if (!response.ok) {
-        alert("Unable to cancel booking right now.");
-        return;
-    }
+    if (!response.ok) { alert("Unable to cancel booking right now."); return; }
 
     await refreshData();
     showToast("Booking cancelled.", false);
 }
 
-// ── Render bookings table ───────────────────────────────────────
 function renderBookings() {
     const tbody = document.getElementById("bookingsTbody");
     const noMsg = document.getElementById("noBookings");
@@ -163,7 +141,7 @@ function renderBookings() {
         return;
     }
     if (noMsg) noMsg.style.display = "none";
-    myBookings.forEach((b) => {
+    myBookings.forEach(b => {
         const status = (b.status || "").toUpperCase();
         const pillClass = { CONFIRMED: "pill-confirmed", PENDING: "pill-pending",
             CANCELLED: "pill-cancelled", COMPLETED: "pill-completed" }[status] || "pill-pending";
@@ -175,36 +153,32 @@ function renderBookings() {
             <td>${b.pickupDate}</td>
             <td>${b.returnDate}</td>
             <td><span class="status-pill ${pillClass}">${status || "PENDING"}</span></td>
-            <td>${canCancel
-                ? `<button class="btn btn-outline-danger btn-sm" onclick="cancelBooking(${b.id})">Cancel</button>`
-                : "–"}</td>`;
+            <td>${canCancel ? `<button class="danger-button" onclick="cancelBooking(${b.id})">Cancel</button>` : "–"}</td>`;
         tbody.appendChild(row);
     });
 }
 
-// ── Stats ───────────────────────────────────────────────────────
 function updateStats() {
-    const available  = vehicles.filter(v => v.available).length;
-    const active     = myBookings.filter(b => ["CONFIRMED", "PENDING"].includes((b.status || "").toUpperCase())).length;
-    const completed  = myBookings.filter(b => (b.status || "").toUpperCase() === "COMPLETED").length;
+    const available = vehicles.filter(v => v.available).length;
+    const active    = myBookings.filter(b => ["CONFIRMED", "PENDING"].includes((b.status || "").toUpperCase())).length;
+    const completed = myBookings.filter(b => (b.status || "").toUpperCase() === "COMPLETED").length;
 
-    const statAvailable = document.getElementById("stat-available");
+    const statAvailable  = document.getElementById("stat-available");
     const statMyBookings = document.getElementById("stat-my-bookings");
-    const statActive = document.getElementById("stat-active");
-    const statCompleted = document.getElementById("stat-completed");
+    const statActive     = document.getElementById("stat-active");
+    const statCompleted  = document.getElementById("stat-completed");
 
-    if (statAvailable) statAvailable.textContent = available;
-    if (statMyBookings) statMyBookings.textContent = myBookings.length;
-    if (statActive) statActive.textContent = active;
-    if (statCompleted) statCompleted.textContent = completed;
+    if (statAvailable)  statAvailable.textContent  = available;
+    if (statMyBookings) statMyBookings.textContent  = myBookings.length;
+    if (statActive)     statActive.textContent      = active;
+    if (statCompleted)  statCompleted.textContent   = completed;
 }
 
-// ── Toast helper ───────────────────────────────────────────────
 function showToast(msg, success = true) {
-    const toastEl = document.getElementById("bookToast");
+    const toastEl  = document.getElementById("bookToast");
     const toastMsg = document.getElementById("toastMsg");
     if (!toastEl || !toastMsg) return;
     toastMsg.textContent = msg;
-    toastEl.className = `toast align-items-center text-bg-${success ? "success" : "secondary"} border-0`;
-    bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 3500 }).show();
+    toastEl.className = `toast ${success ? "toast-success" : "toast-secondary"} show`;
+    setTimeout(() => { toastEl.className = toastEl.className.replace(" show", ""); }, 3500);
 }

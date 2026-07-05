@@ -1,52 +1,101 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Booking · Detail</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="http://localhost:8080/styles.css"/>
+    <link rel="stylesheet" href="http://localhost:8080/styles.css">
 </head>
-<body class="bg-light">
-<nav class="navbar navbar-dark bg-primary">
-    <div class="container">
-        <span class="navbar-brand mb-0 h1">Instant Mobility · Booking (BC-03)</span>
-        <div>
-            <a class="btn btn-sm btn-outline-light" th:href="@{/ui/search}">Search</a>
-            <a class="btn btn-sm btn-outline-light" th:href="@{/ui/bookings}">My bookings</a>
+<body>
+<main class="container">
+
+    <header class="topbar">
+        <div class="topbar-brand">
+            <span class="badge-bc">BC-03</span>
+            <h1>Instant Mobility · Booking</h1>
         </div>
-    </div>
-</nav>
+        <nav class="nav-links">
+            <a th:href="@{/ui/search}">Search</a>
+            <a th:href="@{/ui/bookings}">My Bookings</a>
+        </nav>
+    </header>
 
-<div class="container py-4">
-    <div class="alert alert-danger" th:if="${error}" th:text="${error}"></div>
+    <section class="panel hero">
+        <div>
+            <p class="eyebrow">Booking Detail</p>
+            <h1>Booking #<span th:text="${booking.bookingId()}">1</span></h1>
+        </div>
+        <nav class="link-group">
+            <a class="link-button secondary-button"
+               th:href="@{/ui/bookings(userId=${booking.userId()})}">← My Bookings</a>
+        </nav>
+    </section>
 
-    <h3>Booking <span th:text="${booking.bookingId()}">1</span></h3>
+    <p th:if="${error}" class="alert alert-danger" th:text="${error}"></p>
 
-    <table class="table bg-white w-auto">
-        <tr><th class="pe-4">Status</th>
-            <td><span class="badge"
-                      th:classappend="${booking.status() == 'ACTIVE'} ? 'bg-success' : (${booking.status() == 'CANCELLED'} ? 'bg-secondary' : 'bg-info')"
-                      th:text="${booking.status()}">ACTIVE</span></td></tr>
-        <tr><th>User</th><td th:text="${booking.userId()}">1</td></tr>
-        <tr><th>Vehicle</th><td th:text="${booking.vehicleId()} + ' (' + ${booking.vehicleType()} + ')'">1</td></tr>
-        <tr><th>Price</th><td th:text="${booking.pricePerUnit()} + ' / ' + ${booking.billingModel()}">0.20</td></tr>
-        <tr><th>Start time</th><td th:text="${booking.startTime()}">—</td></tr>
-        <tr><th>End time</th><td th:text="${booking.endTime()} ?: '—'">—</td></tr>
-        <tr><th>Start location</th><td th:text="${booking.startLatitude()} + ', ' + ${booking.startLongitude()}">—</td></tr>
-        <tr><th>Total cost</th><td th:text="${booking.totalCost()} ?: '—'">—</td></tr>
-    </table>
+    <section class="panel">
+        <h2>Trip Info</h2>
+        <div class="detail-grid">
+            <span class="detail-label">Status</span>
+            <span class="detail-value">
+                <span class="status"
+                      th:classappend="${booking.status() == 'ACTIVE'} ? 'status-active' : (${booking.status() == 'CANCELLED'} ? 'status-inactive' : 'status-info')"
+                      th:text="${booking.status()}">ACTIVE</span>
+            </span>
 
-    <form method="post" th:action="@{/ui/bookings/{id}/end(id=${booking.bookingId()})}"
-          th:if="${booking.status() == 'ACTIVE'}" class="mb-2">
-        <button class="btn btn-success" type="submit">End ride</button>
-        <span class="text-muted ms-2 small">End location &amp; distance are captured automatically (simulated device telemetry).</span>
-    </form>
+            <hr class="detail-divider">
 
-    <form method="post" th:action="@{/ui/bookings/{id}/cancel(id=${booking.bookingId()})}"
-          th:if="${booking.status() == 'ACTIVE'}" class="mb-2">
-        <button class="btn btn-danger" type="submit">Cancel booking</button>
-    </form>
-    <a class="btn btn-link" th:href="@{/ui/bookings(userId=${booking.userId()})}">← Back to my bookings</a>
-</div>
+            <span class="detail-label">User</span>
+            <span class="detail-value" th:text="${booking.userId()}">1</span>
+
+            <hr class="detail-divider">
+
+            <span class="detail-label">Vehicle</span>
+            <span class="detail-value"
+                  th:text="${booking.vehicleId()} + ' (' + ${booking.vehicleType()} + ')'">1</span>
+
+            <hr class="detail-divider">
+
+            <span class="detail-label">Price</span>
+            <span class="detail-value"
+                  th:text="${booking.pricePerUnit()} + ' / ' + ${booking.billingModel()}">0.20</span>
+
+            <hr class="detail-divider">
+
+            <span class="detail-label">Start Time</span>
+            <span class="detail-value" th:text="${booking.startTime()}">—</span>
+
+            <hr class="detail-divider">
+
+            <span class="detail-label">End Time</span>
+            <span class="detail-value" th:text="${booking.endTime()} ?: '—'">—</span>
+
+            <hr class="detail-divider">
+
+            <span class="detail-label">Start Location</span>
+            <span class="detail-value"
+                  th:text="${booking.startLatitude()} + ', ' + ${booking.startLongitude()}">—</span>
+
+            <hr class="detail-divider">
+
+            <span class="detail-label">Total Cost</span>
+            <span class="detail-value" th:text="${booking.totalCost()} ?: '—'">—</span>
+        </div>
+    </section>
+
+    <section class="panel" th:if="${booking.status() == 'ACTIVE'}">
+        <h2>Actions</h2>
+        <div class="btn-row">
+            <form method="post" th:action="@{/ui/bookings/{id}/end(id=${booking.bookingId()})}">
+                <button type="submit">End Ride</button>
+            </form>
+            <form method="post" th:action="@{/ui/bookings/{id}/cancel(id=${booking.bookingId()})}">
+                <button class="danger-button" type="submit">Cancel Booking</button>
+            </form>
+        </div>
+        <p class="text-muted" style="margin-top:.5rem;">End location &amp; distance are captured automatically (simulated device telemetry).</p>
+    </section>
+
+</main>
 </body>
 </html>

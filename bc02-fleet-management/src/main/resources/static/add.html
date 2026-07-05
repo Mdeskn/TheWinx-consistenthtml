@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Add Vehicle</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fleet Management – Add Vehicle</title>
     <link rel="stylesheet" href="http://localhost:8080/styles.css">
 </head>
 <body>
-
-<div class="fleet-shell">
+<main class="container">
 
     <header class="topbar">
         <div class="topbar-brand">
@@ -23,9 +24,9 @@
     <section class="hero-banner">
         <div>
             <h2>Add a New Vehicle</h2>
-            <p>Create a vehicle for a provider with daily pricing, location, and usage restrictions.</p>
+            <p>Register a vehicle with location, pricing, and usage restrictions.</p>
         </div>
-        <div class="hero-icon">ADD</div>
+        <span class="hero-icon" aria-hidden="true">➕</span>
     </section>
 
     <section class="section-panel">
@@ -33,19 +34,13 @@
 
         <form id="vehicleForm">
             <div class="form-grid">
-
-                <label>
-                    Provider ID
+                <label>Provider ID
                     <input type="number" id="providerId" value="1" required>
                 </label>
-
-                <label>
-                    Vehicle Name
+                <label>Vehicle Name
                     <input type="text" id="name" placeholder="Tier E-Scooter" required>
                 </label>
-
-                <label>
-                    Type
+                <label>Type
                     <select id="type" required>
                         <option value="E_SCOOTER">E-Scooter</option>
                         <option value="BICYCLE">Bicycle</option>
@@ -53,118 +48,78 @@
                         <option value="E_CAR">E-Car</option>
                     </select>
                 </label>
-
-                <label>
-                    Price Per Day
+                <label>Price Per Day (EUR)
                     <input type="number" step="0.01" id="price" placeholder="8.00" required>
                 </label>
-
-                <label>
-                    Description
+                <label>Description
                     <input type="text" id="description" placeholder="Dortmund City vehicle">
                 </label>
-
-                <label>
-                    Latitude
+                <label>Latitude
                     <input type="number" step="0.0001" id="lat" placeholder="51.5136" required>
                 </label>
-
-                <label>
-                    Longitude
+                <label>Longitude
                     <input type="number" step="0.0001" id="lon" placeholder="7.4653" required>
                 </label>
-
-                <label>
-                    Max Duration Minutes
+                <label>Max Duration (min)
                     <input type="number" id="maxDuration" placeholder="120">
                 </label>
-
-                <label>
-                    Max Kilometers
+                <label>Max Kilometers
                     <input type="number" id="maxKm" placeholder="30">
                 </label>
-
-                <label>
-                    Minimum Age
+                <label>Minimum Age
                     <input type="number" id="minAge" placeholder="18">
                 </label>
-
-                <label>
-                    Max Persons
+                <label>Max Persons
                     <input type="number" id="maxPersons" placeholder="1">
                 </label>
-
-                <label>
-                    Billing Model
+                <label>Billing Model
                     <input type="text" value="PER_DAY" disabled>
                 </label>
-
             </div>
 
-            <div style="margin-top: 1rem; display: flex; gap: .7rem; flex-wrap: wrap;">
+            <div class="btn-row" style="margin-top:1rem;">
                 <button type="submit">Add Vehicle</button>
-                <a href="list.html" class="primary-btn secondary-btn">View Vehicles</a>
+                <a href="list.html" class="link-button secondary-button">View Vehicles</a>
             </div>
 
             <p id="message" class="message"></p>
         </form>
     </section>
 
-</div>
-
+</main>
 <script>
-document.getElementById("vehicleForm").addEventListener("submit", addVehicle);
-
-async function addVehicle(event) {
-    event.preventDefault();
-
+document.getElementById("vehicleForm").addEventListener("submit", async e => {
+    e.preventDefault();
     const providerId = document.getElementById("providerId").value;
-    const message = document.getElementById("message");
-
+    const message    = document.getElementById("message");
     const vehicle = {
-        name: document.getElementById("name").value.trim(),
-        type: document.getElementById("type").value,
-        description: document.getElementById("description").value.trim(),
-        currentLatitude: Number(document.getElementById("lat").value),
-        currentLongitude: Number(document.getElementById("lon").value),
-        pricePerUnit: Number(document.getElementById("price").value),
-        billingModel: "PER_DAY",
+        name:               document.getElementById("name").value.trim(),
+        type:               document.getElementById("type").value,
+        description:        document.getElementById("description").value.trim(),
+        currentLatitude:    Number(document.getElementById("lat").value),
+        currentLongitude:   Number(document.getElementById("lon").value),
+        pricePerUnit:       Number(document.getElementById("price").value),
+        billingModel:       "PER_DAY",
         maxDurationMinutes: Number(document.getElementById("maxDuration").value),
-        maxKilometers: Number(document.getElementById("maxKm").value),
-        minAge: Number(document.getElementById("minAge").value),
-        maxPersons: Number(document.getElementById("maxPersons").value)
+        maxKilometers:      Number(document.getElementById("maxKm").value),
+        minAge:             Number(document.getElementById("minAge").value),
+        maxPersons:         Number(document.getElementById("maxPersons").value)
     };
-
-    if (!vehicle.name) {
-        message.textContent = "Vehicle name is required.";
-        message.className = "message error";
-        return;
-    }
-
+    if (!vehicle.name) { message.textContent = "Vehicle name is required."; message.className = "message error"; return; }
     try {
-        const response = await fetch(`http://localhost:8082/providers/${providerId}/vehicles`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(vehicle)
+        const r = await fetch(`http://localhost:8082/providers/${providerId}/vehicles`, {
+            method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(vehicle)
         });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(errorText || "Vehicle could not be added");
-        }
-
+        if (!r.ok) throw new Error(await r.text());
         message.textContent = "Vehicle added successfully.";
         message.className = "message success";
-
         document.getElementById("vehicleForm").reset();
         document.getElementById("providerId").value = providerId;
-
-    } catch (error) {
+    } catch {
         message.textContent = "Could not add vehicle. The name may already exist for this provider.";
         message.className = "message error";
     }
-}
+});
 </script>
-
 </body>
 </html>

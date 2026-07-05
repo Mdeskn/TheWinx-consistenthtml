@@ -72,15 +72,14 @@
                     <td>
                         <span th:if="${r.comment != null and !r.comment.isEmpty()}"
                               th:text="${#strings.abbreviate(r.comment, 40)}"
-                              style="font-style: italic; color: #6b7285;"></span>
+                              class="text-muted italic"></span>
                         <span th:if="${r.comment == null or r.comment.isEmpty()}"
-                              style="color: #aab;">-</span>
+                              class="text-muted">-</span>
                     </td>
                     <td th:text="${#temporals.format(r.createdAt, 'yyyy-MM-dd')}"></td>
                     <td>
                         <a th:href="@{/ratings/{id}(id=${r.ratingId})}"
-                           class="link-button secondary-button"
-                           style="font-size:0.78rem; padding: 0.3rem 0.6rem;">View</a>
+                           class="link-button secondary-button">View</a>
                     </td>
                 </tr>
                 </tbody>

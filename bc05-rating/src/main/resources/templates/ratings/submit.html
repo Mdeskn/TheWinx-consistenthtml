@@ -65,12 +65,12 @@
                 </label>
             </div>
 
-            <label style="width: 100%;">
-                Comment <span style="color: #aab; font-weight: 400;">(optional)</span>
+            <label class="form-full">
+                Comment <span class="text-muted">(optional)</span>
                 <textarea th:field="*{comment}" placeholder="Share your experience..."></textarea>
             </label>
 
-            <div style="width: 100%; display: flex; gap: 0.65rem; margin-top: 0.4rem;">
+            <div class="form-full btn-row">
                 <button type="submit">Submit Rating</button>
                 <a class="link-button secondary-button" th:href="@{/ratings}">Cancel</a>
             </div>

@@ -15,11 +15,11 @@
             <h1>Microservice Console</h1>
             <p class="subtitle">Manage users, assign roles, and view fleet availability.</p>
         </div>
-        <div class="link-group">
+        <nav class="link-group">
             <a class="link-button" href="/ui/login">Login</a>
             <a class="link-button secondary-button" href="/ui/register">Register</a>
             <a class="link-button secondary-button" href="/ui/dashboard">User Dashboard</a>
-        </div>
+        </nav>
     </header>
 
     <section class="panel">
@@ -39,12 +39,7 @@
             <table>
                 <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>Status</th>
-                    <th>Roles</th>
-                    <th>Actions</th>
+                    <th>ID</th><th>Username</th><th>Email</th><th>Status</th><th>Roles</th><th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -64,15 +59,15 @@
                             <input type="text" name="roleName" placeholder="USER or ADMIN" required>
                             <button type="submit">Assign</button>
                         </form>
-                        <div style="display:flex;gap:.4rem;margin-top:.3rem;flex-wrap:wrap;">
+                        <nav class="btn-row">
                             <a class="link-button secondary-button"
                                th:href="@{/ui/users/{id}/edit(id=${user.id})}">Edit</a>
-                            <form action="/ui/users/deactivate" method="post" style="margin:0;">
+                            <form action="/ui/users/deactivate" method="post">
                                 <input type="hidden" name="userId" th:value="${user.id}">
                                 <button type="button" class="danger-button"
                                         onclick="toggleStatus(event)">Deactivate</button>
                             </form>
-                        </div>
+                        </nav>
                     </td>
                 </tr>
                 </tbody>
@@ -87,11 +82,7 @@
             <table>
                 <thead>
                 <tr>
-                    <th>Vehicle</th>
-                    <th>Plate</th>
-                    <th>Type</th>
-                    <th>Price/Day (EUR)</th>
-                    <th>Availability</th>
+                    <th>Vehicle</th><th>Plate</th><th>Type</th><th>Price/Day (EUR)</th><th>Availability</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -113,40 +104,29 @@
 
     <section class="panel">
         <h2>Mock Contracts</h2>
-        <div class="contracts-grid">
+        <nav class="contracts-grid">
             <a class="contract-link" href="/api/contracts/v1/booking/identity-check?username=demo.user">Booking identity check</a>
             <a class="contract-link" href="/api/contracts/v1/payment/eligibility?userId=1">Payment eligibility</a>
             <a class="contract-link" href="/api/contracts/v1/provider/access?userId=2">Provider portal access</a>
-        </div>
+        </nav>
     </section>
 
 </main>
-
 <script>
 const userStatusMap = {};
-
 function toggleStatus(event) {
     const btn = event.target;
-    const form = btn.closest('form');
-    const userId = form.querySelector('input[name="userId"]').value;
-    const row = form.closest('tr');
-    const statusSpan = row.querySelector('.status');
-
+    const form = btn.closest("form");
+    const userId = form.querySelector("input[name='userId']").value;
+    const row = form.closest("tr");
+    const statusSpan = row.querySelector(".status");
     if (!(userId in userStatusMap)) userStatusMap[userId] = true;
     userStatusMap[userId] = !userStatusMap[userId];
     const isActive = userStatusMap[userId];
-
-    if (isActive) {
-        btn.textContent = "Deactivate";
-        btn.className = "danger-button";
-        statusSpan.textContent = "ACTIVE";
-        statusSpan.className = "status status-active";
-    } else {
-        btn.textContent = "Activate";
-        btn.className = "link-button secondary-button";
-        statusSpan.textContent = "INACTIVE";
-        statusSpan.className = "status status-inactive";
-    }
+    btn.textContent = isActive ? "Deactivate" : "Activate";
+    btn.className   = isActive ? "danger-button" : "link-button secondary-button";
+    statusSpan.textContent = isActive ? "ACTIVE" : "INACTIVE";
+    statusSpan.className   = "status " + (isActive ? "status-active" : "status-inactive");
 }
 </script>
 </body>

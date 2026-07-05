@@ -56,11 +56,10 @@
             <hr class="detail-divider">
 
             <span class="detail-label">Comment</span>
-            <span class="detail-value"
+            <span class="detail-value italic"
                   th:if="${rating.comment != null and !rating.comment.isEmpty()}"
-                  th:text="${rating.comment}"
-                  style="font-style: italic;"></span>
-            <span class="detail-value" style="color: #aab;"
+                  th:text="${rating.comment}"></span>
+            <span class="detail-value text-muted"
                   th:if="${rating.comment == null or rating.comment.isEmpty()}">No comment left.</span>
         </div>
     </div>
