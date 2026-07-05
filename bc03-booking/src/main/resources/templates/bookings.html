@@ -18,24 +18,16 @@
         <a href="http://localhost:8085/ratings">Ratings</a>
     </nav>
 
-    <header class="topbar">
-        <div class="topbar-brand">
-            <span class="badge-bc">BC-03</span>
-            <h1>Instant Mobility · Booking</h1>
-        </div>
-        <nav class="nav-links">
-            <a th:href="@{/ui/search}">Search</a>
-            <a th:href="@{/ui/bookings}">My Bookings</a>
+    <header class="panel hero">
+        <hgroup>
+            <p class="eyebrow">BC-03 · Booking</p>
+            <h1>My Bookings</h1>
+            <p class="subtitle">View and manage your active and past ride bookings.</p>
+        </hgroup>
+        <nav class="link-group">
+            <a class="link-button secondary-button" th:href="@{/ui/search}">← Search Vehicles</a>
         </nav>
     </header>
-
-    <section class="hero-banner">
-        <hgroup>
-            <h2>My Bookings</h2>
-            <p>View and manage your active and past ride bookings.</p>
-        </hgroup>
-        <span class="hero-icon" aria-hidden="true">📋</span>
-    </section>
 
     <section class="panel">
         <h2>Filter by User</h2>

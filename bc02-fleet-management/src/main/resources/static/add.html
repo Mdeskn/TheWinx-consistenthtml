@@ -18,28 +18,20 @@
         <a href="http://localhost:8085/ratings">Ratings</a>
     </nav>
 
-    <header class="topbar">
-        <div class="topbar-brand">
-            <span class="badge-bc">BC-02</span>
-            <h1>Fleet Management</h1>
-        </div>
-        <nav class="nav-links">
-            <a href="list.html">Vehicles</a>
-            <a href="add.html">Add Vehicle</a>
-            <a href="search.html">Search Nearby</a>
+    <header class="panel hero">
+        <hgroup>
+            <p class="eyebrow">BC-02 · Fleet Management</p>
+            <h1>Add a New Vehicle</h1>
+            <p class="subtitle">Register a vehicle with location, pricing, and usage restrictions.</p>
+        </hgroup>
+        <nav class="link-group">
+            <a class="link-button secondary-button" href="list.html">← All Vehicles</a>
+            <a class="link-button secondary-button" href="search.html">Search Nearby</a>
         </nav>
     </header>
 
-    <section class="hero-banner">
-        <hgroup>
-            <h2>Add a New Vehicle</h2>
-            <p>Register a vehicle with location, pricing, and usage restrictions.</p>
-        </hgroup>
-        <span class="hero-icon" aria-hidden="true">➕</span>
-    </section>
-
-    <section class="section-panel">
-        <h3><span class="dot"></span>Vehicle Details</h3>
+    <section class="panel">
+        <h2>Vehicle Details</h2>
 
         <form id="vehicleForm">
             <div class="form-grid">
@@ -86,7 +78,7 @@
                 </label>
             </div>
 
-            <div class="btn-row" style="margin-top:1rem;">
+            <nav class="form-full btn-row">
                 <button type="submit">Add Vehicle</button>
                 <a href="list.html" class="link-button secondary-button">View Vehicles</a>
             </div>

@@ -18,11 +18,19 @@
         <a href="http://localhost:8085/ratings">Ratings</a>
     </nav>
 
-    <section class="panel">
-        <p class="eyebrow">BC-04</p>
-        <h1>Create Payment</h1>
-        <p>Booking data is mocked here by manually entering booking ID, user ID, and amount.</p>
+    <header class="panel hero">
+        <hgroup>
+            <p class="eyebrow">BC-04 · Payment</p>
+            <h1>Create Payment</h1>
+            <p class="subtitle">Booking data is mocked here by manually entering booking ID, user ID, and amount.</p>
+        </hgroup>
+        <nav class="link-group">
+            <a class="link-button secondary-button" href="/payments">← Back to Payments</a>
+        </nav>
+    </header>
 
+    <section class="panel">
+        <h2>Payment Details</h2>
         <form th:action="@{/payments}" method="post" class="form-grid">
             <label>Booking ID
                 <input type="number" name="bookingId" value="1001" required>
@@ -43,7 +51,6 @@
             </label>
             <nav class="form-full btn-row">
                 <button type="submit">Process Payment</button>
-                <a class="link-button secondary-button" href="/payments">Back to Payments</a>
             </nav>
         </form>
     </section>

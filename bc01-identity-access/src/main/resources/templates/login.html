@@ -6,30 +6,40 @@
     <title>Login – TheWinx</title>
     <link rel="stylesheet" href="http://localhost:8080/styles.css">
 </head>
-<body class="auth-theme">
-<main class="auth-shell">
+<body>
+<main class="container">
 
-    <aside class="auth-art">
-        <a class="brand" href="/">TheWinx</a>
-    </aside>
+    <nav class="site-nav">
+        <a class="site-nav-brand" href="http://localhost:8081/">TheWinx</a>
+        <a class="current" href="http://localhost:8081/">Identity</a>
+        <a href="http://localhost:8082/list.html">Fleet</a>
+        <a href="http://localhost:8083/ui/search">Booking</a>
+        <a href="http://localhost:8084/payments">Payments</a>
+        <a href="http://localhost:8085/ratings">Ratings</a>
+    </nav>
 
-    <section class="auth-form-wrap">
-        <div class="auth-form-inner">
+    <header class="panel hero">
+        <hgroup>
+            <p class="eyebrow">BC-01 · Identity &amp; Access</p>
             <h1>Welcome back</h1>
-            <p class="auth-sub">Sign in to manage fleet bookings and user accounts.</p>
+            <p class="subtitle">Sign in to manage fleet bookings and user accounts.</p>
+        </hgroup>
+        <nav class="link-group">
+            <a class="link-button secondary-button" href="/ui/register">Create account</a>
+        </nav>
+    </header>
 
-            <nav class="auth-switch" aria-label="Authentication mode">
-                <a class="active" href="/ui/login">Login</a>
-                <a href="/ui/register">Register</a>
-            </nav>
+    <p th:if="${error}" class="alert alert-danger" th:text="${error}"></p>
 
-            <p th:if="${error}" class="alert alert-danger" th:text="${error}" style="margin-top:1rem;"></p>
-
-            <form class="auth-form" action="/ui/login" method="post">
-                <input class="form-control" type="text" name="username" placeholder="Username or e-mail" required>
-
+    <section class="panel">
+        <h2>Sign in</h2>
+        <form action="/ui/login" method="post">
+            <label>Username or e-mail
+                <input type="text" name="username" placeholder="Username or e-mail" required>
+            </label>
+            <label>Password
                 <div class="input-group">
-                    <input class="form-control" id="password" type="password" name="password" placeholder="Password" required>
+                    <input id="password" type="password" name="password" placeholder="Password" required>
                     <button type="button" class="toggle-btn" id="pwToggle" aria-label="Show password">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                             <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
@@ -37,26 +47,22 @@
                         </svg>
                     </button>
                 </div>
+            </label>
+            <label>
+                <input type="checkbox" id="rememberMe"> Remember me
+            </label>
+            <nav class="btn-row">
+                <button type="submit">Login</button>
+            </nav>
+        </form>
+    </section>
 
-                <label class="auth-meta">
-                    <input type="checkbox" id="rememberMe">
-                    Remember me
-                </label>
-
-                <div class="auth-actions">
-                    <button type="submit" class="auth-btn">Login</button>
-                    <a class="auth-link" href="#">Forgot password?</a>
-                </div>
-            </form>
-
-            <section class="auth-result" th:if="${auth != null}">
-                <h3>Authentication Result</h3>
-                <p><strong>User ID:</strong> <span th:text="${auth.userId}"></span></p>
-                <p><strong>Username:</strong> <span th:text="${auth.username}"></span></p>
-                <p><strong>Token Type:</strong> <span th:text="${auth.tokenType}"></span></p>
-                <p><strong>Permissions:</strong> <span th:text="${auth.permissions}"></span></p>
-            </section>
-        </div>
+    <section class="panel" th:if="${auth != null}">
+        <h2>Authentication Result</h2>
+        <p><strong>User ID:</strong> <span th:text="${auth.userId}"></span></p>
+        <p><strong>Username:</strong> <span th:text="${auth.username}"></span></p>
+        <p><strong>Token Type:</strong> <span th:text="${auth.tokenType}"></span></p>
+        <p><strong>Permissions:</strong> <span th:text="${auth.permissions}"></span></p>
     </section>
 
 </main>

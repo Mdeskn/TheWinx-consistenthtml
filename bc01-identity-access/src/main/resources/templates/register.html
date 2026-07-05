@@ -6,69 +6,92 @@
     <title>Register – TheWinx</title>
     <link rel="stylesheet" href="http://localhost:8080/styles.css">
 </head>
-<body class="auth-theme">
-<main class="auth-shell">
+<body>
+<main class="container">
 
-    <aside class="auth-art">
-        <a class="brand" href="/">TheWinx</a>
-    </aside>
+    <nav class="site-nav">
+        <a class="site-nav-brand" href="http://localhost:8081/">TheWinx</a>
+        <a class="current" href="http://localhost:8081/">Identity</a>
+        <a href="http://localhost:8082/list.html">Fleet</a>
+        <a href="http://localhost:8083/ui/search">Booking</a>
+        <a href="http://localhost:8084/payments">Payments</a>
+        <a href="http://localhost:8085/ratings">Ratings</a>
+    </nav>
 
-    <section class="auth-form-wrap">
-        <div class="auth-form-inner">
+    <header class="panel hero">
+        <hgroup>
+            <p class="eyebrow">BC-01 · Identity &amp; Access</p>
             <h1>Create your account</h1>
-            <p class="auth-sub">Join TheWinx to book and manage fleet vehicles.</p>
+            <p class="subtitle">Join TheWinx to book and manage fleet vehicles.</p>
+        </hgroup>
+        <nav class="link-group">
+            <a class="link-button secondary-button" href="/ui/login">← Sign in instead</a>
+        </nav>
+    </header>
 
-            <nav class="auth-switch" aria-label="Authentication mode">
-                <a href="/ui/login">Login</a>
-                <a class="active" href="/ui/register">Register</a>
+    <p th:if="${error}" class="alert alert-danger" th:text="${error}"></p>
+
+    <section class="panel">
+        <h2>Account Details</h2>
+        <form id="registerForm" action="/ui/users" method="post" novalidate>
+
+            <div class="form-grid">
+                <label>First name
+                    <input id="firstName" type="text" name="firstName" placeholder="First name" required>
+                </label>
+                <label>Last name
+                    <input id="lastName" type="text" name="lastName" placeholder="Last name" required>
+                </label>
+                <label>E-mail address
+                    <input id="email" type="email" name="email" placeholder="E-mail address" required>
+                </label>
+                <label>Username
+                    <input id="username" type="text" name="username" placeholder="Username" required>
+                </label>
+                <label>Phone number
+                    <input id="phoneNumber" type="text" name="phoneNumber" placeholder="Phone number"
+                           inputmode="numeric" maxlength="20" pattern="[0-9]{1,20}" required>
+                </label>
+            </div>
+
+            <div class="form-grid">
+                <label>Password
+                    <div class="input-group">
+                        <input id="password" type="password" name="password" placeholder="Password" minlength="6" required>
+                        <button type="button" class="toggle-btn" data-pw-toggle aria-label="Show password">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
+                                <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
+                            </svg>
+                        </button>
+                    </div>
+                </label>
+                <label>Confirm password
+                    <div class="input-group">
+                        <input id="confirmPassword" type="password" name="confirmPassword" placeholder="Confirm password" minlength="6" required>
+                        <button type="button" class="toggle-btn" data-pw-toggle aria-label="Show password">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
+                                <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
+                            </svg>
+                        </button>
+                    </div>
+                </label>
+            </div>
+
+            <input type="hidden" name="redirectTo" value="/ui/login">
+
+            <nav class="form-full btn-row">
+                <button type="submit">Register</button>
+                <a class="link-button secondary-button" href="/ui/login">Already have an account?</a>
             </nav>
 
-            <p th:if="${error}" class="alert alert-danger" th:text="${error}" style="margin-top:1rem;"></p>
-
-            <form id="registerForm" class="auth-form" action="/ui/users" method="post" novalidate>
-
-                <div class="form-row-2">
-                    <input class="form-control" id="firstName" type="text" name="firstName" placeholder="First name" required>
-                    <input class="form-control" id="lastName"  type="text" name="lastName"  placeholder="Last name"  required>
-                </div>
-
-                <input class="form-control" id="email"       type="email" name="email"       placeholder="E-mail address" required>
-                <input class="form-control" id="username"    type="text"  name="username"    placeholder="Username"       required>
-                <input class="form-control" id="phoneNumber" type="text"  name="phoneNumber" placeholder="Phone number"   inputmode="numeric" maxlength="20" pattern="[0-9]{1,20}" required>
-
-                <div class="input-group">
-                    <input class="form-control" id="password" type="password" name="password" placeholder="Password" minlength="6" required>
-                    <button type="button" class="toggle-btn" data-pw-toggle aria-label="Show password">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
-                            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
-                        </svg>
-                    </button>
-                </div>
-
-                <div class="input-group">
-                    <input class="form-control" id="confirmPassword" type="password" name="confirmPassword" placeholder="Confirm password" minlength="6" required>
-                    <button type="button" class="toggle-btn" data-pw-toggle aria-label="Show password">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
-                            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
-                        </svg>
-                    </button>
-                </div>
-
-                <input type="hidden" name="redirectTo" value="/ui/login">
-
-                <div class="auth-actions">
-                    <button type="submit" class="auth-btn">Register</button>
-                </div>
-
-            </form>
-        </div>
+        </form>
     </section>
 
 </main>
 <script>
-const phoneInput   = document.getElementById("phoneNumber");
+const phoneInput    = document.getElementById("phoneNumber");
 const passwordInput = document.getElementById("password");
 const confirmInput  = document.getElementById("confirmPassword");
 const toggleBtns    = document.querySelectorAll("[data-pw-toggle]");

@@ -18,27 +18,16 @@
         <a href="http://localhost:8085/ratings">Ratings</a>
     </nav>
 
-    <header class="topbar">
-        <div class="topbar-brand">
-            <span class="badge-bc">BC-03</span>
-            <h1>Instant Mobility · Booking</h1>
-        </div>
-        <nav class="nav-links">
-            <a th:href="@{/ui/search}">Search</a>
-            <a th:href="@{/ui/bookings}">My Bookings</a>
-        </nav>
-    </header>
-
-    <section class="panel hero">
+    <header class="panel hero">
         <hgroup>
-            <p class="eyebrow">Booking Detail</p>
+            <p class="eyebrow">BC-03 · Booking</p>
             <h1>Booking #<span th:text="${booking.bookingId()}">1</span></h1>
         </hgroup>
         <nav class="link-group">
             <a class="link-button secondary-button"
                th:href="@{/ui/bookings(userId=${booking.userId()})}">← My Bookings</a>
         </nav>
-    </section>
+    </header>
 
     <p th:if="${error}" class="alert alert-danger" th:text="${error}"></p>
 

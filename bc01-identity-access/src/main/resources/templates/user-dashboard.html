@@ -18,21 +18,16 @@
         <a href="http://localhost:8085/ratings">Ratings</a>
     </nav>
 
-    <header class="topbar">
-        <div class="topbar-brand">
-            <span class="badge-bc">User Portal</span>
-            <h1>TheWinx Fleet Booking</h1>
-        </div>
-        <a class="btn-logout" href="/ui/login">Sign out</a>
-    </header>
-
-    <section class="hero-banner">
+    <header class="panel hero">
         <hgroup>
-            <h2>Browse &amp; Book Vehicles</h2>
-            <p>Find the right vehicle for your trip and book it in seconds.</p>
+            <p class="eyebrow">User Portal</p>
+            <h1>Browse &amp; Book Vehicles</h1>
+            <p class="subtitle">Find the right vehicle for your trip and book it in seconds.</p>
         </hgroup>
-        <span class="hero-icon" aria-hidden="true">🚗</span>
-    </section>
+        <nav class="link-group">
+            <a class="link-button secondary-button" href="/ui/login">Sign out</a>
+        </nav>
+    </header>
 
     <section class="stats-strip">
         <article class="stat-card">
@@ -57,8 +52,8 @@
         </article>
     </section>
 
-    <section class="section-panel">
-        <h3><span class="dot"></span>Available Vehicles</h3>
+    <section class="panel">
+        <h2>Available Vehicles</h2>
         <div class="filter-bar">
             <input type="text" id="searchInput" placeholder="Search by name or plate…" oninput="filterVehicles()">
             <select id="typeFilter" onchange="filterVehicles()">
@@ -95,8 +90,8 @@
            class="subtitle">No vehicles match your filters.</p>
     </section>
 
-    <section class="section-panel">
-        <h3><span class="dot"></span>My Bookings</h3>
+    <section class="panel">
+        <h2>My Bookings</h2>
         <div class="table-wrap">
             <table class="bookings-table" id="bookingsTable">
                 <thead>
