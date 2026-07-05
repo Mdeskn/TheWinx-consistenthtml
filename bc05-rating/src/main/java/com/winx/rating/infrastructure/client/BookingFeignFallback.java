@@ -14,7 +14,7 @@ public class BookingFeignFallback implements BookingFeignClient {
 
     @Override
     public BookingStatusResponse getBooking(Long bookingId) {
-        log.warn("bc03-booking unreachable — circuit open. Allowing rating for booking {}.", bookingId);
+        log.warn("bc03-booking unreachable - circuit open. Allowing rating for booking {}.", bookingId);
         return new BookingStatusResponse(bookingId, null, "COMPLETED");
     }
 }

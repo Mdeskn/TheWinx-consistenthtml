@@ -131,13 +131,13 @@ function renderVehicles() {
         const row = document.createElement("tr");
         row.innerHTML = `
             <td>${v.id}</td>
-            <td><strong>${v.name || "—"}</strong></td>
+            <td><strong>${v.name || "-"}</strong></td>
             <td>${v.type}</td>
-            <td>${v.description || "—"}</td>
+            <td>${v.description || "-"}</td>
             <td><span class="status ${statusClass}">${v.status}</span></td>
             <td>EUR ${v.pricePerUnit}</td>
             <td>${v.billingModel}</td>
-            <td>${v.maxDurationMinutes || "—"} min, ${v.maxKilometers || "—"} km, min age ${v.minAge || "—"}, ${v.maxPersons || "—"} persons</td>
+            <td>${v.maxDurationMinutes || "-"} min, ${v.maxKilometers || "-"} km, min age ${v.minAge || "-"}, ${v.maxPersons || "-"} persons</td>
             <td>
                 <button class="secondary-button" data-id="${v.id}" data-status="${nextStatus}">${buttonText}</button>
                 <button class="danger-button" data-delete-id="${v.id}" style="margin-left:.4rem">Delete</button>

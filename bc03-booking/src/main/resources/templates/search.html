@@ -37,7 +37,7 @@
         <form method="get" th:action="@{/ui/search}" class="form-grid">
             <label>Location
                 <select id="location" name="location">
-                    <option value="">— choose a location —</option>
+                    <option value="">- choose a location -</option>
                     <option th:each="loc : ${locations}"
                             th:value="${loc.key()}"
                             th:text="${loc.displayName()}"

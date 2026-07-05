@@ -42,7 +42,7 @@ public class RatingSubmissionService {
         BookingStatusResponse booking = bookingClient.getBooking(bookingId);
         if (!"COMPLETED".equals(booking.status())) {
             throw new IllegalStateException(
-                    "Booking " + bookingId + " cannot be rated — status is " + booking.status() + ".");
+                    "Booking " + bookingId + " cannot be rated - status is " + booking.status() + ".");
         }
 
         RatingTarget target = new RatingTarget(vehicleId, providerId, bookingId);

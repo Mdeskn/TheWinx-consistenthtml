@@ -14,7 +14,7 @@ public class FleetFeignFallback implements FleetFeignClient {
 
     @Override
     public VehicleResponse getVehicle(Long vehicleId) {
-        log.warn("bc02-fleet-management unreachable — circuit open. Returning placeholder for vehicle {}.", vehicleId);
+        log.warn("bc02-fleet-management unreachable - circuit open. Returning placeholder for vehicle {}.", vehicleId);
         return new VehicleResponse(vehicleId, null, "UNKNOWN", "Vehicle info unavailable", "UNKNOWN");
     }
 }

@@ -87,7 +87,7 @@ public class BookingProxyController {
                 ? vehicleTypeLabel(b.getVehicleType()) + " #" + b.getVehicleId()
                 : "Vehicle #" + b.getVehicleId();
 
-        String startDate = b.getStartTime() != null ? b.getStartTime().format(DATE_FMT) : "—";
+        String startDate = b.getStartTime() != null ? b.getStartTime().format(DATE_FMT) : "-";
         String endDate   = b.getEndTime()   != null ? b.getEndTime().format(DATE_FMT)   : "Active";
 
         return Map.of(

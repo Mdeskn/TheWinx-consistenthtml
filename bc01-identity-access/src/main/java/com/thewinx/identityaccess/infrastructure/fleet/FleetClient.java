@@ -9,7 +9,7 @@ import java.util.List;
 
 /**
  * Feign client for communicating with the bc02-fleet-management service.
- * All cross-context data flows through this REST client — never via a shared database.
+ * All cross-context data flows through this REST client - never via a shared database.
  *
  * name must match spring.application.name in bc02-fleet-management/application.yml.
  * url is used as a direct fallback when Eureka is not running (standalone mode).

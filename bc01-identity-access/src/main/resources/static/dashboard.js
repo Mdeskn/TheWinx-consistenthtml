@@ -97,13 +97,13 @@ async function showVehicleDetail(vehicleId) {
         document.getElementById("vd-name").textContent = `${iconFor(v.type)} ${v.description || "Vehicle #" + vehicleId}`;
 
         const rows = [
-            ["Type",     v.type || "—"],
-            ["Status",   v.status || "—"],
-            ["Price",    v.pricePerUnit != null ? `EUR ${v.pricePerUnit} / ${v.billingModel === "PER_HOUR" ? "hr" : "km"}` : "—"],
-            ["Capacity", v.maxPersons != null ? `${v.maxPersons} person(s)` : "—"],
-            ["Max duration", v.maxDurationMinutes != null ? `${v.maxDurationMinutes} min` : "—"],
-            ["Max distance", v.maxKilometers != null ? `${v.maxKilometers} km` : "—"],
-            ["Min age",  v.minAge != null ? `${v.minAge} yrs` : "—"],
+            ["Type",     v.type || "-"],
+            ["Status",   v.status || "-"],
+            ["Price",    v.pricePerUnit != null ? `EUR ${v.pricePerUnit} / ${v.billingModel === "PER_HOUR" ? "hr" : "km"}` : "-"],
+            ["Capacity", v.maxPersons != null ? `${v.maxPersons} person(s)` : "-"],
+            ["Max duration", v.maxDurationMinutes != null ? `${v.maxDurationMinutes} min` : "-"],
+            ["Max distance", v.maxKilometers != null ? `${v.maxKilometers} km` : "-"],
+            ["Min age",  v.minAge != null ? `${v.minAge} yrs` : "-"],
         ];
         document.getElementById("vd-info").innerHTML = rows.map(([k, val]) =>
             `<tr><td style="padding:.22rem .5rem;color:#6b7285">${k}</td><td style="padding:.22rem .5rem;font-weight:600">${val}</td></tr>`
@@ -149,8 +149,8 @@ function openBookModal(vehicleId) {
     document.getElementById("bs1-title").textContent = v.name || `Vehicle #${vehicleId}`;
     document.getElementById("bs1-info").innerHTML = `
         <div style="font-size:2rem;margin-bottom:.4rem">${v.icon || "🚗"}</div>
-        <div><strong>Type:</strong> ${v.type || "—"}</div>
-        <div><strong>Billing:</strong> EUR ${v.pricePerDay || "—"} ${billingLabel}</div>
+        <div><strong>Type:</strong> ${v.type || "-"}</div>
+        <div><strong>Billing:</strong> EUR ${v.pricePerDay || "-"} ${billingLabel}</div>
         <div><strong>Capacity:</strong> ${v.seats} seat${v.seats !== 1 ? "s" : ""}</div>
         <div><strong>Status:</strong> <span style="color:#44c67a;font-weight:600">AVAILABLE</span></div>`;
 
@@ -162,7 +162,7 @@ function goPaymentStep() {
     const v = vehicles.find(x => x.id === selectedVehicleId) || {};
     const billingLabel = v.billingModel === "PER_HOUR" ? "hr" : "km";
     document.getElementById("bs2-price").textContent =
-        `Estimated rate: EUR ${v.pricePerDay || "—"}/${billingLabel}. Your card will be charged automatically when you end the ride.`;
+        `Estimated rate: EUR ${v.pricePerDay || "-"}/${billingLabel}. Your card will be charged automatically when you end the ride.`;
     showStep(2);
 }
 
@@ -220,9 +220,9 @@ async function confirmBooking() {
         const booking = await res.json();
 
         // Populate step 3
-        document.getElementById("cb-id").textContent      = booking.id || "—";
+        document.getElementById("cb-id").textContent      = booking.id || "-";
         document.getElementById("cb-vehicle").textContent = booking.vehicleName || `Vehicle #${selectedVehicleId}`;
-        document.getElementById("cb-pay").textContent     = `${payMethod} — charged on ride end`;
+        document.getElementById("cb-pay").textContent     = `${payMethod} - charged on ride end`;
         document.getElementById("cb-time").textContent    = booking.pickupDate || new Date().toLocaleString();
 
         showStep(3);
@@ -255,9 +255,9 @@ async function endRide(bookingId) {
     await refreshData();
 
     // Show payment result modal
-    const totalStr = booking.totalCost != null ? `EUR ${booking.totalCost}` : "—";
+    const totalStr = booking.totalCost != null ? `EUR ${booking.totalCost}` : "-";
     document.getElementById("pr-id").textContent      = booking.id || bookingId;
-    document.getElementById("pr-vehicle").textContent = booking.vehicleName || "—";
+    document.getElementById("pr-vehicle").textContent = booking.vehicleName || "-";
     document.getElementById("pr-total").textContent   = totalStr;
 
     const rateUrl = `${RATING_URL}?bookingId=${bookingId}&userId=${currentUserId}` +
@@ -288,7 +288,7 @@ function renderBookings() {
         const rateUrl   = canRate
             ? `${RATING_URL}?bookingId=${b.id}&userId=${currentUserId}&vehicleId=${b.vehicleId || ""}&providerId=${b.providerId || ""}`
             : null;
-        const totalStr  = b.totalCost && Number(b.totalCost) > 0 ? `EUR ${b.totalCost}` : "—";
+        const totalStr  = b.totalCost && Number(b.totalCost) > 0 ? `EUR ${b.totalCost}` : "-";
 
         const row = document.createElement("tr");
         row.innerHTML = `

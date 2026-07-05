@@ -61,23 +61,23 @@
             <hr class="detail-divider">
 
             <span class="detail-label">Start Time</span>
-            <span class="detail-value" th:text="${booking.startTime()}">—</span>
+            <span class="detail-value" th:text="${booking.startTime()}">-</span>
 
             <hr class="detail-divider">
 
             <span class="detail-label">End Time</span>
-            <span class="detail-value" th:text="${booking.endTime()} ?: '—'">—</span>
+            <span class="detail-value" th:text="${booking.endTime()} ?: '-'">-</span>
 
             <hr class="detail-divider">
 
             <span class="detail-label">Start Location</span>
             <span class="detail-value"
-                  th:text="${booking.startLatitude()} + ', ' + ${booking.startLongitude()}">—</span>
+                  th:text="${booking.startLatitude()} + ', ' + ${booking.startLongitude()}">-</span>
 
             <hr class="detail-divider">
 
             <span class="detail-label">Total Cost</span>
-            <span class="detail-value" th:text="${booking.totalCost()} ?: '—'">—</span>
+            <span class="detail-value" th:text="${booking.totalCost()} ?: '-'">-</span>
         </div>
     </section>
 
