@@ -5,6 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TheWinx – My Dashboard</title>
     <link rel="stylesheet" href="http://localhost:8080/styles.css">
+    <link rel="stylesheet" th:href="@{/dashboard.css}" href="/dashboard.css">
+    <style>
+        /* ── step indicators ── */
+        .modal-steps { display: flex; align-items: center; gap: .5rem; margin-bottom: 1.25rem; }
+        .modal-step { display: flex; align-items: center; gap: .4rem; font-size: .8rem; color: var(--color-text-muted, #6b7285); }
+        .modal-step.active { color: #1492f2; font-weight: 600; }
+        .modal-step.done   { color: #44c67a; }
+        .step-dot { width: 22px; height: 22px; border-radius: 50%; border: 2px solid currentColor;
+            display: flex; align-items: center; justify-content: center; font-size: .7rem; font-weight: 700; flex-shrink: 0; }
+        .modal-step-sep { flex: 1; height: 1px; background: #d8e0eb; min-width: 12px; }
+
+        /* ── payment method radio cards ── */
+        .pay-methods { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; margin: 1rem 0; }
+        .pay-method-label { position: relative; cursor: pointer; }
+        .pay-method-label input { position: absolute; opacity: 0; width: 0; height: 0; }
+        .pay-method-card {
+            border: 2px solid #d8e0eb; border-radius: 10px; padding: .7rem .5rem;
+            text-align: center; font-size: .82rem; font-weight: 600; color: #374151;
+            transition: border-color .15s, background .15s; user-select: none;
+        }
+        .pay-method-label input:checked + .pay-method-card {
+            border-color: #1492f2; background: #eef6ff; color: #1492f2;
+        }
+        .pay-method-icon { font-size: 1.3rem; display: block; margin-bottom: .25rem; }
+
+        /* ── booking confirmed box ── */
+        .confirm-box {
+            border: 2px solid #44c67a; border-radius: 12px; padding: 1.1rem 1.2rem;
+            background: #f0fbf4; margin-bottom: 1rem;
+        }
+        .confirm-box h3 { margin: 0 0 .5rem; color: #2f9f5f; font-size: 1rem; }
+        .confirm-row { display: flex; justify-content: space-between; font-size: .87rem;
+            color: #374151; padding: .2rem 0; }
+        .confirm-row strong { color: #14213d; }
+
+        /* ── payment result box ── */
+        .pay-result-box {
+            border: 2px solid #1492f2; border-radius: 12px; padding: 1.1rem 1.2rem;
+            background: #eef6ff; margin-bottom: 1rem;
+        }
+        .pay-result-box h3 { margin: 0 0 .5rem; color: #0e6cb4; font-size: 1rem; }
+        .pay-result-actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1rem; }
+        .btn-rate { background: #f59e0b; color: #fff; border: none; border-radius: 8px;
+            padding: .55rem 1rem; font-weight: 600; font-size: .9rem; cursor: pointer; font-family: inherit;
+            text-decoration: none; display: inline-block; }
+        .btn-rate:hover { background: #d97706; }
+        .btn-view-pay { background: none; border: 2px solid #1492f2; color: #1492f2; border-radius: 8px;
+            padding: .5rem 1rem; font-weight: 600; font-size: .9rem; cursor: pointer; font-family: inherit;
+            text-decoration: none; display: inline-block; }
+        .btn-view-pay:hover { background: #eef6ff; }
+
+        /* ── vehicle detail modal tweaks ── */
+        #vehicleDetailModal { max-width: 520px; width: 92%; }
+        .vd-info-table { width: 100%; margin-bottom: 1rem; border-collapse: collapse; }
+        .vd-info-table td { padding: .25rem .5rem; font-size: .88rem; }
+        .vd-info-table td:first-child { color: #6b7285; width: 48%; }
+        .vd-info-table td:last-child { font-weight: 600; color: #14213d; }
+    </style>
 </head>
 <body>
 <main class="container">
@@ -22,132 +80,187 @@
         <hgroup>
             <p class="eyebrow">User Portal</p>
             <h1>Browse &amp; Book Vehicles</h1>
-            <p class="subtitle">Find the right vehicle for your trip and book it in seconds.</p>
+            <p class="subtitle">Find the right vehicle for your trip and book it instantly.</p>
         </hgroup>
         <nav class="link-group">
-            <a class="link-button secondary-button" href="/ui/login">Sign out</a>
+            <span class="subtitle" style="align-self:center;margin-right:.5rem" th:text="'Hello, ' + ${defaultUsername}"></span>
+            <a class="link-button secondary-button" href="/ui/logout">Sign out</a>
         </nav>
     </header>
 
     <section class="stats-strip">
         <article class="stat-card">
             <span class="stat-label">Available Now</span>
-            <span class="stat-value" id="stat-available" th:text="${statAvailable}">–</span>
+            <span class="stat-value" id="stat-available">–</span>
             <span class="stat-sub">vehicles ready to book</span>
         </article>
         <article class="stat-card">
             <span class="stat-label">My Bookings</span>
-            <span class="stat-value" id="stat-my-bookings" th:text="${statMyBookings}">–</span>
+            <span class="stat-value" id="stat-my-bookings">–</span>
             <span class="stat-sub">total reservations</span>
         </article>
         <article class="stat-card">
             <span class="stat-label">Active Trips</span>
-            <span class="stat-value" id="stat-active" th:text="${statActive}">–</span>
+            <span class="stat-value" id="stat-active">–</span>
             <span class="stat-sub">currently in use</span>
         </article>
         <article class="stat-card">
             <span class="stat-label">Completed</span>
-            <span class="stat-value" id="stat-completed" th:text="${statCompleted}">–</span>
+            <span class="stat-value" id="stat-completed">–</span>
             <span class="stat-sub">past trips</span>
         </article>
     </section>
 
+    <!-- ── Vehicles ── -->
     <section class="panel">
         <h2>Available Vehicles</h2>
         <div class="filter-bar">
-            <input type="text" id="searchInput" placeholder="Search by name or plate…" oninput="filterVehicles()">
+            <input type="text" id="searchInput" placeholder="Search by name or type…" oninput="filterVehicles()">
             <select id="typeFilter" onchange="filterVehicles()">
                 <option value="">All types</option>
-                <option value="Sedan">Sedan</option>
-                <option value="SUV">SUV</option>
-                <option value="Van">Van</option>
-                <option value="Truck">Truck</option>
+                <option value="E_SCOOTER">E-Scooter</option>
+                <option value="BICYCLE">Bicycle</option>
+                <option value="E_BIKE">E-Bike</option>
+                <option value="E_CAR">E-Car</option>
             </select>
             <select id="availFilter" onchange="filterVehicles()">
                 <option value="">All availability</option>
                 <option value="true">Available</option>
-                <option value="false">Unavailable</option>
+                <option value="false">Booked</option>
             </select>
         </div>
-        <div class="vehicle-grid" id="vehicleGrid">
-            <article th:each="v : ${vehicles}" class="vehicle-card" th:data-id="${v.id}">
-                <figure class="vehicle-card-img" th:text="${v.icon}">🚗</figure>
-                <div class="vehicle-card-body">
-                    <h4 th:text="${v.name}">Vehicle Name</h4>
-                    <p class="vehicle-card-meta" th:text="${v.type} + ' · ' + ${v.seats} + ' seats · ' + ${v.plate}">Type · Seats · Plate</p>
-                    <footer class="vehicle-card-footer">
-                        <span class="price-tag" th:text="'EUR ' + ${v.pricePerDay} + '/day'">EUR 0.0/day</span>
-                        <span class="availability-badge" th:classappend="${v.available} ? 'avail-yes' : 'avail-no'"
-                              th:text="${v.available} ? 'Available' : 'Booked'">Available</span>
-                    </footer>
-                    <button class="btn-book" th:disabled="${!v.available}"
-                            th:onclick="'openBookModal(' + ${v.id} + ')'"
-                            th:text="${v.available} ? 'Book Now' : 'Unavailable'">Book Now</button>
-                </div>
-            </article>
-        </div>
-        <p id="noResults" th:style="${#lists.isEmpty(vehicles)} ? '' : 'display:none'"
-           class="subtitle">No vehicles match your filters.</p>
+        <div class="vehicle-grid" id="vehicleGrid"></div>
+        <p id="noResults" style="display:none" class="subtitle">No vehicles match your filters.</p>
     </section>
 
+    <!-- ── My Bookings ── -->
     <section class="panel">
         <h2>My Bookings</h2>
         <div class="table-wrap">
             <table class="bookings-table" id="bookingsTable">
                 <thead>
                 <tr>
-                    <th>#</th><th>Vehicle</th><th>Pick-up</th><th>Return</th><th>Status</th><th>Action</th>
+                    <th>#</th><th>Vehicle</th><th>Started</th><th>Ended</th>
+                    <th>Status</th><th>Total</th><th>Cancel</th><th>End Ride</th><th>Rate</th>
                 </tr>
                 </thead>
-                <tbody id="bookingsTbody">
-                <tr th:each="b : ${bookings}">
-                    <td th:text="${b.id}">#</td>
-                    <td>
-                        <strong th:text="${b.vehicleName}">Vehicle</strong>
-                        <br><small class="text-muted" th:text="${b.plate}">Plate</small>
-                    </td>
-                    <td th:text="${b.pickupDate}">—</td>
-                    <td th:text="${b.returnDate}">—</td>
-                    <td>
-                        <span class="status-pill"
-                              th:classappend="${b.status != null} ?
-                                (${#strings.toUpperCase(b.status) == 'CONFIRMED'} ? 'pill-confirmed' :
-                                (${#strings.toUpperCase(b.status) == 'PENDING'}   ? 'pill-pending' :
-                                (${#strings.toUpperCase(b.status) == 'CANCELLED'} ? 'pill-cancelled' : 'pill-completed'))) : 'pill-pending'"
-                              th:text="${b.status != null ? #strings.toUpperCase(b.status) : 'PENDING'}">PENDING</span>
-                    </td>
-                    <td>
-                        <button th:if="${b.status != null and (#strings.toUpperCase(b.status) == 'CONFIRMED' or #strings.toUpperCase(b.status) == 'PENDING')}"
-                                class="danger-button" th:onclick="'cancelBooking(' + ${b.id} + ')'">Cancel</button>
-                        <span th:unless="${b.status != null and (#strings.toUpperCase(b.status) == 'CONFIRMED' or #strings.toUpperCase(b.status) == 'PENDING')}">–</span>
-                    </td>
-                </tr>
-                </tbody>
+                <tbody id="bookingsTbody"></tbody>
             </table>
         </div>
-        <p id="noBookings" th:style="${#lists.isEmpty(bookings)} ? '' : 'display:none'" class="subtitle">
-            You have no bookings yet. Browse the vehicles above and make your first reservation!
+        <p id="noBookings" style="display:none" class="subtitle">
+            No bookings yet. Browse vehicles above and make your first reservation!
         </p>
     </section>
 
 </main>
 
-<dialog id="bookModal">
-    <h2>Book Vehicle</h2>
-    <p id="bookVehicleInfo" class="subtitle"></p>
-    <div class="dialog-form">
-        <label>Pick-up Date <input type="date" id="pickupDate" required></label>
-        <label>Return Date  <input type="date" id="returnDate" required></label>
-        <label>Notes <span class="text-muted">(optional)</span>
-            <textarea id="bookNotes" placeholder="Any special requirements…"></textarea>
-        </label>
+<!-- ═══════════════════════════ BOOK MODAL (3-step) ═══════════════════════════ -->
+<dialog id="bookModal" style="max-width:460px;width:92%">
+
+    <!-- step indicators -->
+    <div class="modal-steps">
+        <div class="modal-step" id="mstep1"><span class="step-dot">1</span>Vehicle</div>
+        <div class="modal-step-sep"></div>
+        <div class="modal-step" id="mstep2"><span class="step-dot">2</span>Payment</div>
+        <div class="modal-step-sep"></div>
+        <div class="modal-step" id="mstep3"><span class="step-dot">3</span>Confirmed</div>
     </div>
-    <nav class="dialog-actions">
-        <button class="secondary-button" type="button" onclick="document.getElementById('bookModal').close()">Cancel</button>
-        <button type="button" onclick="confirmBooking()">Confirm Booking</button>
+
+    <!-- STEP 1: vehicle summary -->
+    <div id="bookStep1">
+        <h2 id="bs1-title" style="margin:0 0 .5rem">Book Vehicle</h2>
+        <div id="bs1-info" style="background:#f5f9ff;border:1px solid #d0e4f7;border-radius:10px;padding:.9rem 1rem;margin-bottom:1rem;font-size:.9rem;line-height:1.7"></div>
+        <p style="font-size:.85rem;color:#6b7285;margin:0 0 1rem">Your ride starts immediately. You'll be charged when you end the trip.</p>
+        <nav class="dialog-actions">
+            <button class="secondary-button" type="button" onclick="closeBookModal()">Cancel</button>
+            <button type="button" onclick="goPaymentStep()">Continue to Payment →</button>
+        </nav>
+    </div>
+
+    <!-- STEP 2: payment method -->
+    <div id="bookStep2" style="display:none">
+        <h2 style="margin:0 0 .75rem">Payment Method</h2>
+        <div class="pay-methods">
+            <label class="pay-method-label">
+                <input type="radio" name="payMethod" value="CARD" checked>
+                <div class="pay-method-card"><span class="pay-method-icon">💳</span>Card</div>
+            </label>
+            <label class="pay-method-label">
+                <input type="radio" name="payMethod" value="BANK_TRANSFER">
+                <div class="pay-method-card"><span class="pay-method-icon">🏦</span>Bank Transfer</div>
+            </label>
+            <label class="pay-method-label">
+                <input type="radio" name="payMethod" value="CASH">
+                <div class="pay-method-card"><span class="pay-method-icon">💵</span>Cash</div>
+            </label>
+        </div>
+        <p id="bs2-price" style="font-size:.87rem;color:#6b7285;margin:0 0 1rem"></p>
+        <nav class="dialog-actions">
+            <button class="secondary-button" type="button" onclick="goVehicleStep()">← Back</button>
+            <button type="button" id="bs2-confirm-btn" onclick="confirmBooking()">Confirm Booking</button>
+        </nav>
+    </div>
+
+    <!-- STEP 3: confirmed -->
+    <div id="bookStep3" style="display:none">
+        <div class="confirm-box">
+            <h3>Booking Confirmed!</h3>
+            <div class="confirm-row"><span>Booking ID</span><strong id="cb-id">—</strong></div>
+            <div class="confirm-row"><span>Vehicle</span><strong id="cb-vehicle">—</strong></div>
+            <div class="confirm-row"><span>Status</span><strong style="color:#1492f2">ACTIVE</strong></div>
+            <div class="confirm-row"><span>Payment</span><strong id="cb-pay">CARD — charged on ride end</strong></div>
+            <div class="confirm-row"><span>Started</span><strong id="cb-time">—</strong></div>
+        </div>
+        <p style="font-size:.85rem;color:#6b7285;margin:0 0 1rem">
+            End your ride from <strong>My Bookings</strong> when done — payment is processed automatically.
+        </p>
+        <nav class="dialog-actions" style="justify-content:flex-end">
+            <a class="secondary-button link-button" href="http://localhost:8084/payments" target="_blank">View Payments (BC-04)</a>
+            <button type="button" onclick="closeBookModal()">View My Bookings</button>
+        </nav>
+    </div>
+
+</dialog>
+
+<!-- ═══════════════════════════ VEHICLE DETAIL MODAL ═══════════════════════════ -->
+<dialog id="vehicleDetailModal">
+    <h2 id="vd-name" style="margin:0 0 .75rem">Vehicle Details</h2>
+    <table class="vd-info-table" id="vd-info"></table>
+    <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.75rem">
+        <strong>Avg Rating:</strong>
+        <span id="vd-avg">–</span>
+        <span id="vd-stars" style="color:#f59e0b;font-size:1.1rem"></span>
+    </div>
+    <div>
+        <h3 style="font-size:.92rem;margin:.5rem 0">Recent Reviews</h3>
+        <ul id="vd-ratings" style="list-style:none;padding:0;margin:0;max-height:160px;overflow-y:auto"></ul>
+    </div>
+    <nav class="dialog-actions" style="margin-top:1rem">
+        <button class="secondary-button" type="button" onclick="document.getElementById('vehicleDetailModal').close()">Close</button>
+        <button type="button" id="vd-book-btn" onclick="bookFromDetail()">Book Now</button>
     </nav>
 </dialog>
 
+<!-- ═══════════════════════════ PAYMENT RESULT MODAL ═══════════════════════════ -->
+<dialog id="payResultModal" style="max-width:440px;width:92%">
+    <div class="pay-result-box">
+        <h3>Ride Complete — Payment Sent!</h3>
+        <div class="confirm-row"><span>Booking ID</span><strong id="pr-id">—</strong></div>
+        <div class="confirm-row"><span>Vehicle</span><strong id="pr-vehicle">—</strong></div>
+        <div class="confirm-row"><span>Total charged</span><strong id="pr-total" style="color:#0e6cb4">—</strong></div>
+        <div class="confirm-row"><span>Method</span><strong>CARD</strong></div>
+    </div>
+    <p style="font-size:.85rem;color:#6b7285;margin:0 0 .5rem">
+        Payment has been sent to BC-04. You can now rate your experience.
+    </p>
+    <div class="pay-result-actions">
+        <a id="pr-rate-link" class="btn-rate" href="#" target="_blank">Rate This Ride ⭐</a>
+        <a class="btn-view-pay" href="http://localhost:8084/payments" target="_blank">View in BC-04 →</a>
+        <button type="button" class="secondary-button" onclick="document.getElementById('payResultModal').close()">Close</button>
+    </div>
+</dialog>
+
+<!-- ═══════════════════════════ TOAST ═══════════════════════════ -->
 <aside class="toast-wrap">
     <div id="bookToast" class="toast">
         <span id="toastMsg"></span>
@@ -155,8 +268,13 @@
 </aside>
 
 <script th:inline="javascript">
-const API_BASE = "/api/v1/identity/fleet";
+const API_BASE        = "/api/v1/identity/fleet";
+const BOOKING_BASE    = "/api/v1/booking";
+const DETAIL_BASE     = "/api/v1/vehicles";
+const RATING_URL      = "http://localhost:8085/ratings/submit";
+const BC04_URL        = "http://localhost:8084/payments";
 const currentUsername = /*[[${defaultUsername}]]*/ "demo.user";
+const currentUserId   = /*[[${currentUserId}]]*/ 1;
 </script>
 <script th:src="@{/dashboard.js}" src="/dashboard.js"></script>
 </body>

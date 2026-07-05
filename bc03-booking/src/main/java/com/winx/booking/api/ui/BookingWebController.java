@@ -51,7 +51,7 @@ public class BookingWebController {
                          RedirectAttributes ra) {
         try {
             Booking booking = service.createBooking(token,
-                    new BookingCreateRequest(vehicleId, startLatitude, startLongitude));
+                    new BookingCreateRequest(vehicleId, startLatitude, startLongitude, null));
             return "redirect:/ui/bookings?userId=" + booking.getUserId();
         } catch (DomainException e) {
             ra.addFlashAttribute("error", e.getMessage());

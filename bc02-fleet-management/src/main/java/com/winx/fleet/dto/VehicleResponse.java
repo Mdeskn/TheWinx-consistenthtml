@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 
 public record VehicleResponse(
         Long vehicleId,
+        Long providerId,
         String name,
         String type,
         String description,
@@ -20,6 +21,7 @@ public record VehicleResponse(
     public static VehicleResponse from(Vehicle v) {
         return new VehicleResponse(
                 v.getId(),
+                v.getProviderId(),
                 v.getName(),
                 v.getType() != null ? v.getType().name() : null,
                 v.getDescription(),

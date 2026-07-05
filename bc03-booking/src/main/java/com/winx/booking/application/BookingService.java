@@ -53,10 +53,10 @@ public class BookingService {
                 .ifPresent(existing -> { throw new ActiveBookingExistsException(principal.id()); });
 
         VehicleSnapshot snapshot = new VehicleSnapshot(
-                vehicle.vehicleId(), vehicle.type(), vehicle.pricePerUnit(), vehicle.billingModel());
+                vehicle.vehicleId(), vehicle.providerId(), vehicle.type(), vehicle.pricePerUnit(), vehicle.billingModel());
         RideLocation start = new RideLocation(request.startLatitude(), request.startLongitude());
 
-        Booking booking = repository.save(Booking.start(principal.id(), snapshot, start));
+        Booking booking = repository.save(Booking.start(principal.id(), snapshot, start, request.paymentMethod()));
         fleetGateway.markBooked(vehicle.vehicleId());
         return booking;
     }
@@ -85,7 +85,7 @@ public class BookingService {
 
         fleetGateway.markAvailable(booking.getVehicleSnapshot().getVehicleId());
         eventPublisher.publishEvent(new BookingCompleted(
-                booking.getBookingId(), booking.getUserId(), totalCost, "EUR"));
+                booking.getBookingId(), booking.getUserId(), totalCost, "EUR", booking.getPaymentMethod()));
         return booking;
     }
 

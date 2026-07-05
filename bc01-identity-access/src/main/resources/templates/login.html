@@ -3,75 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login – TheWinx</title>
+    <title>Sign In – TheWinx</title>
     <link rel="stylesheet" href="http://localhost:8080/styles.css">
+    <style>
+        body { margin: 0; background: #0f1e30; min-height: 100vh; }
+        .auth-wrap { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; }
+        @media (max-width: 720px) { .auth-wrap { grid-template-columns: 1fr; } .auth-art { display: none; } }
+
+        .auth-art {
+            background: linear-gradient(160deg, #0e3a60 0%, #0a253f 60%, #071828 100%);
+            display: flex; flex-direction: column; justify-content: center;
+            padding: 3rem; position: relative; overflow: hidden;
+        }
+        .auth-art::before {
+            content: ""; position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 30% 60%, rgba(20,146,242,.18) 0%, transparent 70%);
+        }
+        .art-brand { font-family: "Space Grotesk", sans-serif; font-size: 1.8rem; font-weight: 700;
+            color: #fff; letter-spacing: -.02em; display: flex; align-items: center;
+            gap: .6rem; margin-bottom: 3rem; position: relative; }
+        .art-brand-dot { width: 10px; height: 10px; background: #1492f2; border-radius: 50%; }
+        .art-headline { position: relative; color: #ffffff; font-family: "Space Grotesk", sans-serif;
+            font-size: clamp(2rem, 3.2vw, 2.8rem); font-weight: 700; line-height: 1.1; margin: 0 0 1rem; }
+        .art-sub { position: relative; color: #8aabcc; font-size: 1rem; line-height: 1.5; max-width: 320px; margin: 0 0 2.5rem; }
+        .art-steps { position: relative; display: flex; flex-direction: column; gap: .9rem; }
+        .art-step { display: flex; align-items: flex-start; gap: .85rem; color: #b8cfdf; font-size: .9rem; }
+        .art-step-icon { width: 30px; height: 30px; border-radius: 7px; background: rgba(20,146,242,.15);
+            border: 1px solid rgba(20,146,242,.3); display: flex; align-items: center;
+            justify-content: center; flex-shrink: 0; font-size: .9rem; }
+        .art-step strong { display: block; color: #e6edf4; font-size: .92rem; margin-bottom: .1rem; }
+
+        .auth-form-panel { background: #ffffff; display: flex; align-items: center; justify-content: center;
+            padding: 2.5rem clamp(1.5rem, 5vw, 4rem); }
+        .auth-form-inner { width: 100%; max-width: 400px; }
+        .auth-form-inner h1 { margin: 0 0 .35rem; font-size: 1.8rem; font-family: "Space Grotesk", sans-serif; color: #14213d; }
+        .auth-form-inner .form-sub { color: #6b7285; font-size: .95rem; margin: 0 0 1.75rem; }
+        .auth-form-inner .form-sub a { color: #1492f2; text-decoration: none; font-weight: 600; }
+        .form-sub a:hover { text-decoration: underline; }
+
+        .auth-form-inner label { display: flex; flex-direction: column; gap: .35rem; font-size: .87rem; font-weight: 600; color: #374151; margin-bottom: 1rem; }
+        .auth-form-inner input[type="text"],
+        .auth-form-inner input[type="password"] {
+            padding: .7rem 1rem; border: 1.5px solid #d1d9e6; border-radius: 10px;
+            font-size: .95rem; font-family: inherit; transition: border-color .15s; outline: none;
+            width: 100%; box-sizing: border-box; }
+        .auth-form-inner input:focus { border-color: #1492f2; }
+
+        .pw-wrap { position: relative; }
+        .pw-wrap input { padding-right: 2.8rem; }
+        .pw-toggle { position: absolute; right: .75rem; top: 50%; transform: translateY(-50%);
+            background: none; border: none; cursor: pointer; color: #6b7285; padding: 0; display: flex; align-items: center; }
+
+        .btn-submit { width: 100%; padding: .78rem; background: #1492f2; color: #fff; border: none;
+            border-radius: 10px; font-size: 1rem; font-weight: 600; font-family: inherit; cursor: pointer;
+            margin-top: .5rem; transition: background .15s; }
+        .btn-submit:hover { background: #0e6cb4; }
+        .form-error { color: #be4444; background: #fdf2f2; border: 1px solid #f4c2c2;
+            border-radius: 10px; padding: .65rem 1rem; margin-bottom: 1rem; font-size: .9rem; }
+
+        .demo-box { margin-top: 1.5rem; border: 1.5px dashed #c5d5e8; border-radius: 12px; padding: 1rem; background: #f5f9ff; }
+        .demo-box-title { font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #1492f2; margin: 0 0 .75rem; }
+        .demo-row { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-bottom: .5rem; }
+        .demo-row:last-child { margin-bottom: 0; }
+        .demo-info { font-size: .84rem; color: #374151; }
+        .demo-info code { font-family: monospace; font-size: .87rem; color: #14213d; background: #e8edf5; padding: 1px 5px; border-radius: 4px; }
+        .demo-badge { font-size: .68rem; font-weight: 700; text-transform: uppercase; background: #e6f0fb; color: #1a6fc4; border-radius: 6px; padding: 1px 6px; margin-left: 4px; }
+        .demo-fill { font-size: .78rem; font-weight: 600; background: #1492f2; color: #fff;
+            border: none; border-radius: 7px; padding: .28rem .7rem; cursor: pointer; flex-shrink: 0; font-family: inherit; }
+        .demo-fill:hover { background: #0e6cb4; }
+    </style>
 </head>
 <body>
-<main class="container">
+<div class="auth-wrap">
+    <div class="auth-art">
+        <div class="art-brand"><span class="art-brand-dot"></span>TheWinx</div>
+        <h1 class="art-headline">Your ride,<br>your way.</h1>
+        <p class="art-sub">Book e-scooters, e-bikes, bicycles and e-cars across the city in seconds.</p>
+        <div class="art-steps">
+            <div class="art-step"><div class="art-step-icon">🔑</div><div><strong>Sign in or register</strong>Create your free account to get started.</div></div>
+            <div class="art-step"><div class="art-step-icon">🚗</div><div><strong>Browse &amp; book a vehicle</strong>See real-time availability and vehicle details.</div></div>
+            <div class="art-step"><div class="art-step-icon">💳</div><div><strong>Pay &amp; ride</strong>Secure payment processed when you end your ride.</div></div>
+            <div class="art-step"><div class="art-step-icon">⭐</div><div><strong>Rate your experience</strong>Help others by rating the vehicle and provider.</div></div>
+        </div>
+    </div>
 
-    <nav class="site-nav">
-        <a class="site-nav-brand" href="http://localhost:8081/">TheWinx</a>
-        <a class="current" href="http://localhost:8081/">Identity</a>
-        <a href="http://localhost:8082/list.html">Fleet</a>
-        <a href="http://localhost:8083/ui/search">Booking</a>
-        <a href="http://localhost:8084/payments">Payments</a>
-        <a href="http://localhost:8085/ratings">Ratings</a>
-    </nav>
-
-    <header class="panel hero">
-        <hgroup>
-            <p class="eyebrow">BC-01 · Identity &amp; Access</p>
-            <h1>Welcome back</h1>
-            <p class="subtitle">Sign in to manage fleet bookings and user accounts.</p>
-        </hgroup>
-        <nav class="link-group">
-            <a class="link-button secondary-button" href="/ui/register">Create account</a>
-        </nav>
-    </header>
-
-    <p th:if="${error}" class="alert alert-danger" th:text="${error}"></p>
-
-    <section class="panel">
-        <h2>Sign in</h2>
-        <form action="/ui/login" method="post">
-            <label>Username or e-mail
-                <input type="text" name="username" placeholder="Username or e-mail" required>
-            </label>
-            <label>Password
-                <div class="input-group">
-                    <input id="password" type="password" name="password" placeholder="Password" required>
-                    <button type="button" class="toggle-btn" id="pwToggle" aria-label="Show password">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
-                            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
-                        </svg>
-                    </button>
+    <div class="auth-form-panel">
+        <div class="auth-form-inner">
+            <h1>Sign in</h1>
+            <p class="form-sub">No account? <a href="/ui/register">Register here →</a></p>
+            <div th:if="${error}" class="form-error" th:text="${error}"></div>
+            <form action="/ui/login" method="post">
+                <label>Username
+                    <input id="username" type="text" name="username" placeholder="e.g. demo.user" autocomplete="username" required>
+                </label>
+                <label>Password
+                    <div class="pw-wrap">
+                        <input id="password" type="password" name="password" placeholder="Password" autocomplete="current-password" required>
+                        <button type="button" class="pw-toggle" id="pwToggle" aria-label="Show password">
+                            <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8M1.173 8a13 13 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5s3.879 1.168 5.168 2.457A13 13 0 0 1 14.828 8q-.086.13-.195.288c-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5s-3.879-1.168-5.168-2.457A13 13 0 0 1 1.172 8z"/>
+                                <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5M4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0"/>
+                            </svg>
+                        </button>
+                    </div>
+                </label>
+                <button type="submit" class="btn-submit">Sign in →</button>
+            </form>
+            <div class="demo-box">
+                <p class="demo-box-title">Demo Accounts — click Fill to auto-load</p>
+                <div class="demo-row">
+                    <div class="demo-info"><code>demo.user</code> / <code>demo123</code><span class="demo-badge">User</span></div>
+                    <button class="demo-fill" onclick="fill('demo.user','demo123')">Fill</button>
                 </div>
-            </label>
-            <label>
-                <input type="checkbox" id="rememberMe"> Remember me
-            </label>
-            <nav class="btn-row">
-                <button type="submit">Login</button>
-            </nav>
-        </form>
-    </section>
-
-    <section class="panel" th:if="${auth != null}">
-        <h2>Authentication Result</h2>
-        <p><strong>User ID:</strong> <span th:text="${auth.userId}"></span></p>
-        <p><strong>Username:</strong> <span th:text="${auth.username}"></span></p>
-        <p><strong>Token Type:</strong> <span th:text="${auth.tokenType}"></span></p>
-        <p><strong>Permissions:</strong> <span th:text="${auth.permissions}"></span></p>
-    </section>
-
-</main>
+                <div class="demo-row">
+                    <div class="demo-info"><code>demo.admin</code> / <code>admin123</code><span class="demo-badge">Admin</span></div>
+                    <button class="demo-fill" onclick="fill('demo.admin','admin123')">Fill</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <script>
+function fill(u, p) {
+    document.getElementById("username").value = u;
+    document.getElementById("password").value = p;
+}
 const pwInput  = document.getElementById("password");
 const pwToggle = document.getElementById("pwToggle");
-const eyeOpen  = pwToggle.innerHTML;
+const eyeOpen  = document.getElementById("eyeIcon").outerHTML;
 const eyeSlash = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M13.359 11.238 15 12.879l-.707.707-2.018-2.018A8.7 8.7 0 0 1 8 13.5C3 13.5 0 8 0 8a15 15 0 0 1 3.293-3.85L1 1.854 1.707 1.146l12 12-.348.092zM11.297 9.176l-1.442-1.442a2 2 0 0 1-2.113-2.113L6.298 4.176A3 3 0 0 0 11.297 9.176M5.833 3.711l1.531 1.531A2 2 0 0 1 9.758 7.636l1.531 1.531A3.998 3.998 0 0 0 12 8c0-.335-.042-.66-.121-.97A13 13 0 0 0 14.828 8c-.058.087-.122.178-.195.288a13 13 0 0 1-1.465 1.755q-.12.12-.246.238l-.735-.735A3 3 0 0 1 8 11a3 3 0 0 1-3-3 3 3 0 0 1 .833-2.089"/><path d="M8 3.5c2.12 0 3.879 1.168 5.168 2.457q.175.175.34.355A13 13 0 0 0 14.828 8c-.086.13-.195.288-.195.288l.707.707S16 8 16 8s-3-5.5-8-5.5a7.8 7.8 0 0 0-2.207.319l.84.84A6.8 6.8 0 0 1 8 3.5"/></svg>';
-
 pwToggle.addEventListener("click", () => {
     const show = pwInput.type === "password";
     pwInput.type = show ? "text" : "password";

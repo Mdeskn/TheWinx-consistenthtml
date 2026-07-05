@@ -1,22 +1,15 @@
 package com.thewinx.identityaccess.infrastructure.fleet.dto;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.math.BigDecimal;
 
-/**
- * Data Transfer Object that maps the JSON response from bc02-fleet-management.
- *
- * Field names here must exactly match the JSON keys returned by the fleet service.
- * Extra fields in the JSON that we don't need are safely ignored (@JsonIgnoreProperties).
- *
- * The dashboard.js frontend reads: id, name, plate, type, seats, pricePerDay, available, icon.
- * These are computed/mapped in the toView() helper below.
- */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class VehicleDto {
 
-    /** Primary key from the fleet database. */
+    /** BC-02 returns "vehicleId" in JSON; accept both names during deserialization. */
+    @JsonAlias("vehicleId")
     private Long id;
 
     /** Provider who owns this vehicle. */

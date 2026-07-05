@@ -20,6 +20,9 @@ public class VehicleSnapshot {
     @Column(name = "vehicle_id")
     private Long vehicleId;
 
+    @Column(name = "provider_id")
+    private Long providerId;
+
     @Column(name = "vehicle_type")
     private String type;
 

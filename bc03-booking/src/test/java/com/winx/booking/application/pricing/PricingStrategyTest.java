@@ -14,7 +14,7 @@ class PricingStrategyTest {
     private final LocalDateTime start = LocalDateTime.of(2026, 1, 1, 10, 0);
 
     private VehicleSnapshot snapshot(String price, String billingModel) {
-        return new VehicleSnapshot(1L, "E_SCOOTER", new BigDecimal(price), billingModel);
+        return new VehicleSnapshot(1L, null, "E_SCOOTER", new BigDecimal(price), billingModel);
     }
 
     @Test

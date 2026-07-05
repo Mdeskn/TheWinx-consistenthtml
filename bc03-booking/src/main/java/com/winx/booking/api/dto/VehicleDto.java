@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record VehicleDto(
         Long vehicleId,
+        Long providerId,
         String type,
         String description,
         String status,

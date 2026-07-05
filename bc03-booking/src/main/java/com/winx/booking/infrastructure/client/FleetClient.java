@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.math.BigDecimal;
 import java.util.List;
 
-@FeignClient(name = "bc02-fleet-management", path = "/vehicles")
+@FeignClient(name = "bc02-fleet-management", url = "${fleet.service.url:http://localhost:8082}", path = "/vehicles")
 public interface FleetClient {
 
     @GetMapping("/{id}")

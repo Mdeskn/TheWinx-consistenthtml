@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +17,7 @@ import com.thewinx.identityaccess.api.dto.UserResponse;
 import com.thewinx.identityaccess.application.FleetService;
 import com.thewinx.identityaccess.application.IdentityAccessService;
 import com.thewinx.identityaccess.application.UnauthorizedException;
+import com.thewinx.identityaccess.infrastructure.UserAccountRepository;
 import com.thewinx.identityaccess.infrastructure.fleet.FleetClient;
 import com.thewinx.identityaccess.infrastructure.fleet.dto.VehicleDto;
 import java.util.List;
@@ -26,11 +28,14 @@ public class IdentityUiController {
     private final IdentityAccessService identityAccessService;
     private final FleetService fleetService;
     private final FleetClient fleetClient;
+    private final UserAccountRepository userAccountRepository;
 
-    public IdentityUiController(IdentityAccessService identityAccessService, FleetService fleetService, FleetClient fleetClient) {
+    public IdentityUiController(IdentityAccessService identityAccessService, FleetService fleetService,
+                                FleetClient fleetClient, UserAccountRepository userAccountRepository) {
         this.identityAccessService = identityAccessService;
         this.fleetService = fleetService;
         this.fleetClient = fleetClient;
+        this.userAccountRepository = userAccountRepository;
     }
 
     @GetMapping("/")
@@ -114,9 +119,13 @@ public class IdentityUiController {
     }
 
     @GetMapping("/ui/dashboard")
-    public String userDashboard(Model model) {
-        String username = "demo.user";
+    public String userDashboard(HttpSession session, Model model) {
+        String username = (String) session.getAttribute("username");
+        Long userId     = (Long)   session.getAttribute("userId");
+        if (username == null) return "redirect:/ui/login";
+
         model.addAttribute("defaultUsername", username);
+        model.addAttribute("currentUserId", userId);
 
         List<VehicleDto> vehicles;
         try {
@@ -124,36 +133,40 @@ public class IdentityUiController {
         } catch (Exception e) {
             vehicles = List.of();
         }
-        List<FleetService.BookingView> bookings = fleetService.listBookingsByUsername(username);
 
         long statAvailable = vehicles.stream().filter(VehicleDto::isAvailable).count();
-        long statMyBookings = bookings.size();
-        long statActive = bookings.stream()
-                .filter(b -> "CONFIRMED".equalsIgnoreCase(b.getStatus()) || "PENDING".equalsIgnoreCase(b.getStatus()))
-                .count();
-        long statCompleted = bookings.stream()
-                .filter(b -> "COMPLETED".equalsIgnoreCase(b.getStatus()))
-                .count();
 
         model.addAttribute("vehicles", vehicles);
-        model.addAttribute("bookings", bookings);
+        model.addAttribute("bookings", List.of());
         model.addAttribute("statAvailable", statAvailable);
-        model.addAttribute("statMyBookings", statMyBookings);
-        model.addAttribute("statActive", statActive);
-        model.addAttribute("statCompleted", statCompleted);
+        model.addAttribute("statMyBookings", 0);
+        model.addAttribute("statActive", 0);
+        model.addAttribute("statCompleted", 0);
 
         return "user-dashboard";
+    }
+
+    @GetMapping("/ui/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "redirect:/ui/login";
     }
 
     @PostMapping("/ui/login")
     public String login(@RequestParam String username,
                         @RequestParam String password,
+                        HttpSession session,
                         Model model) {
         try {
             AuthResponse response = AuthResponse.from(identityAccessService.authenticate(username, password));
-            // Admins have USER_MANAGE or ROLE_MANAGE permission; regular users do not
             boolean isAdmin = response.getPermissions().contains("ROLE_MANAGE")
                     || response.getPermissions().contains("USER_MANAGE");
+
+            Long userId = userAccountRepository.findByUsername(username)
+                    .map(u -> u.getId()).orElse(null);
+            session.setAttribute("username", username);
+            session.setAttribute("userId", userId);
+
             return isAdmin ? "redirect:/" : "redirect:/ui/dashboard";
         } catch (UnauthorizedException e) {
             model.addAttribute("error", "Invalid username or password");

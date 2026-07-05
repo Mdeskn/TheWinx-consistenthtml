@@ -61,7 +61,15 @@ feign:
   circuitbreaker:
     enabled: true
 
-# Direct URL for bc02-fleet-management (used when Eureka is not running)
+# Direct URLs for downstream services (used when Eureka is not running)
 fleet:
   service:
     url: http://localhost:8082
+
+booking:
+  service:
+    url: http://localhost:8083
+
+rating:
+  service:
+    url: http://localhost:8085

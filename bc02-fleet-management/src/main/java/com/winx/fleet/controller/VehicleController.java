@@ -31,8 +31,8 @@ public class VehicleController {
     }
 
     @GetMapping
-    public List<Vehicle> getAllVehicles() {
-        return vehicleRepository.findAll();
+    public List<VehicleResponse> getAllVehicles() {
+        return vehicleRepository.findAll().stream().map(VehicleResponse::from).toList();
     }
 
     @GetMapping("/{id}")

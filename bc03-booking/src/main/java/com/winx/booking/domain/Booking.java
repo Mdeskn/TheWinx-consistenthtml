@@ -62,16 +62,20 @@ public class Booking {
     @Column(nullable = false)
     private BookingStatus status;
 
-    private Booking(Long userId, VehicleSnapshot vehicleSnapshot, RideLocation startLocation) {
+    @Column(name = "payment_method")
+    private String paymentMethod;
+
+    private Booking(Long userId, VehicleSnapshot vehicleSnapshot, RideLocation startLocation, String paymentMethod) {
         this.userId = userId;
         this.vehicleSnapshot = vehicleSnapshot;
         this.startLocation = startLocation;
         this.interval = TimeInterval.startingNow();
         this.status = BookingStatus.ACTIVE;
+        this.paymentMethod = paymentMethod != null ? paymentMethod : "CARD";
     }
 
-    public static Booking start(Long userId, VehicleSnapshot vehicleSnapshot, RideLocation startLocation) {
-        return new Booking(userId, vehicleSnapshot, startLocation);
+    public static Booking start(Long userId, VehicleSnapshot vehicleSnapshot, RideLocation startLocation, String paymentMethod) {
+        return new Booking(userId, vehicleSnapshot, startLocation, paymentMethod);
     }
 
     public void cancel() {

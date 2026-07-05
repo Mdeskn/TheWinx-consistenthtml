@@ -32,8 +32,8 @@ class BookingControllerTest {
     private BookingService service;
 
     private Booking sampleBooking() {
-        VehicleSnapshot snapshot = new VehicleSnapshot(1L, "E_SCOOTER", new BigDecimal("0.20"), "PER_HOUR");
-        return Booking.start(1L, snapshot, new RideLocation(52.52, 13.40));
+        VehicleSnapshot snapshot = new VehicleSnapshot(1L, null, "E_SCOOTER", new BigDecimal("0.20"), "PER_HOUR");
+        return Booking.start(1L, snapshot, new RideLocation(52.52, 13.40), "CARD");
     }
 
     @Test

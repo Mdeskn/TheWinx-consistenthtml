@@ -12,8 +12,6 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @RequiredArgsConstructor
 public class PaymentEventListener {
 
-    private static final String DEFAULT_PAYMENT_METHOD = "CARD";
-
     private final PaymentGateway paymentGateway;
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -23,6 +21,6 @@ public class PaymentEventListener {
                 event.userId(),
                 event.amount(),
                 event.currency(),
-                DEFAULT_PAYMENT_METHOD));
+                event.paymentMethod()));
     }
 }

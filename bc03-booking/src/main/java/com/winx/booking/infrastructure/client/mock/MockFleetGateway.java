@@ -13,7 +13,7 @@ import java.util.List;
 public class MockFleetGateway implements FleetGateway {
 
     private VehicleDto sample(Long id, String status) {
-        return new VehicleDto(id, "E_SCOOTER", "Sample e-scooter " + id, status,
+        return new VehicleDto(id, null, "E_SCOOTER", "Sample e-scooter " + id, status,
                 new BigDecimal("0.20"), "PER_HOUR", 18);
     }
 

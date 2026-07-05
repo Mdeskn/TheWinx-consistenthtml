@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 public record BookingCreateRequest(
         @NotNull Long vehicleId,
         @NotNull Double startLatitude,
-        @NotNull Double startLongitude
+        @NotNull Double startLongitude,
+        String paymentMethod
 ) {
 }

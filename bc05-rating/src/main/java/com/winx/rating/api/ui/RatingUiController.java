@@ -29,8 +29,18 @@ public class RatingUiController {
     }
 
     @GetMapping("/submit")
-    public String submitForm(Model model) {
-        model.addAttribute("form", new RatingForm());
+    public String submitForm(
+            @RequestParam(required = false) Long bookingId,
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) Long vehicleId,
+            @RequestParam(required = false) Long providerId,
+            Model model) {
+        RatingForm form = new RatingForm();
+        if (bookingId  != null) form.setBookingId(bookingId);
+        if (userId     != null) form.setUserId(userId);
+        if (vehicleId  != null) form.setVehicleId(vehicleId);
+        if (providerId != null) form.setProviderId(providerId);
+        model.addAttribute("form", form);
         return "ratings/submit";
     }
 

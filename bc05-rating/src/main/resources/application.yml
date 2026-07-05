@@ -59,3 +59,12 @@ resilience4j:
         slidingWindowSize: 10
         failureRateThreshold: 50
         waitDurationInOpenState: 10s
+
+# Direct URLs for downstream services (standalone mode, without Eureka)
+fleet:
+  service:
+    url: http://localhost:8082
+
+booking:
+  service:
+    url: http://localhost:8083
