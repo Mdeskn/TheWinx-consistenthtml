@@ -1,0 +1,42 @@
+import technology from "../technology/docker.technology" as Docker
+import technology from "../technology/eureka.technology" as Eureka
+
+@technology(Docker)
+@technology(Eureka)
+ApiGateway is Eureka::_infrastructure.Eureka {
+
+    aspects {
+        Docker::_aspects.Dockerfile('
+            FROM eclipse-temurin:21-jre
+            COPY infra-api-gateway-0.1.0-SNAPSHOT.jar app.jar
+            EXPOSE 8080
+            ENTRYPOINT ["java", "-jar", "app.jar"]
+        ');
+
+        Docker::_aspects.ComposePart('
+            infra-api-gateway:
+                build: infra-api-gateway
+                image: thewinx/api-gateway
+                depends_on:
+                  - infra-eureka-server
+                environment:
+                  - "EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://infra-eureka-server:8761/eureka"
+                  - "SPRING_PROFILES_ACTIVE=eureka"
+                ports:
+                  - "8080:8080"
+                volumes:
+                  - "maven_repo:/root/.m2"
+        ');
+    }
+
+    default values {
+        hostname="infra-api-gateway"
+        port=8080
+        imageType="jre"
+        mavenGroupId="com.winx"
+        mavenArtifactId="infra-api-gateway"
+        mavenVersion="0.1.0-SNAPSHOT"
+        mavenName="API Gateway"
+        programmingLanguage="Java"
+    }
+}

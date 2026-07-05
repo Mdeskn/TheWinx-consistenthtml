@@ -2,8 +2,10 @@ package com.winx.fleet.service;
 
 import com.winx.fleet.model.Vehicle;
 import com.winx.fleet.repository.VehicleRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -27,7 +29,12 @@ public class VehicleAvailabilityService {
     }
 
     // SEARCH AVAILABLE VEHICLES NEAR LOCATION
+    @CircuitBreaker(name = "vehicleDb", fallbackMethod = "findAvailableNearFallback")
     public List<Vehicle> findAvailableNear(Double lat, Double lon, Double radiusKm) {
         return vehicleRepository.findAvailableNear(lat, lon, radiusKm);
+    }
+
+    public List<Vehicle> findAvailableNearFallback(Double lat, Double lon, Double radiusKm, Throwable t) {
+        return Collections.emptyList();
     }
 }

@@ -1,0 +1,139 @@
+context fleetManagement {
+
+    // ── Enumerations ───────────────────────────────────────────────────────────
+
+    enum VehicleType {
+        BIKE,
+        SCOOTER,
+        CAR
+    }
+
+    enum VehicleStatus {
+        AVAILABLE,
+        BOOKED,
+        MAINTENANCE,
+        UNAVAILABLE
+    }
+
+    enum BillingModel {
+        PER_HOUR,
+        PER_KM
+    }
+
+    // ── Aggregate Root ─────────────────────────────────────────────────────────
+
+    // @Entity
+    // @Table(name = "vehicles")
+    structure Vehicle<entity, aggregate> {
+        // @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+        immutable long vehicleId<identifier>,
+        // @Column(nullable = false)
+        long providerId,
+        // @Column(nullable = false)
+        string name,
+        VehicleType type,
+        string description,
+        VehicleStatus status,
+        double currentLatitude,
+        double currentLongitude,
+        // @Column(precision = 10, scale = 2)
+        double pricePerUnit,
+        BillingModel billingModel,
+        int maxDurationMinutes,
+        int maxKilometers,
+        int minAge,
+        int maxPersons
+    }
+
+    collection Vehicles {
+        Vehicle v
+    }
+
+    // ── DTOs ───────────────────────────────────────────────────────────────────
+
+    structure CreateVehicleRequest<valueObject> {
+        immutable long providerId,
+        immutable string name,
+        immutable VehicleType type,
+        immutable string description,
+        immutable double pricePerUnit,
+        immutable BillingModel billingModel,
+        immutable int maxDurationMinutes,
+        immutable int maxKilometers,
+        immutable int minAge,
+        immutable int maxPersons
+    }
+
+    structure UpdateVehicleRequest<valueObject> {
+        string name,
+        string description,
+        double pricePerUnit,
+        int maxDurationMinutes,
+        int maxKilometers,
+        int minAge,
+        int maxPersons
+    }
+
+    structure UpdateLocationRequest<valueObject> {
+        immutable double latitude,
+        immutable double longitude
+    }
+
+    structure UpdateStatusRequest<valueObject> {
+        immutable VehicleStatus status
+    }
+
+    structure VehicleResponse<valueObject> {
+        immutable long vehicleId,
+        immutable long providerId,
+        immutable string name,
+        immutable VehicleType type,
+        immutable string description,
+        immutable VehicleStatus status,
+        immutable double currentLatitude,
+        immutable double currentLongitude,
+        immutable double pricePerUnit,
+        immutable BillingModel billingModel,
+        immutable int maxDurationMinutes,
+        immutable int maxKilometers,
+        immutable int minAge,
+        immutable int maxPersons
+    }
+
+    collection VehicleResponses {
+        VehicleResponse r
+    }
+
+    // ── Repository ─────────────────────────────────────────────────────────────
+
+    // @Repository
+    structure VehicleRepository<repository> {
+        function Vehicles findAll,
+        function Vehicle findById(long id),
+        function Vehicles findAvailableNear(double lat, double lon, double radiusKm),
+        function Vehicle save(Vehicle vehicle),
+        function boolean existsById(long id)
+    }
+
+    // ── Application Services ───────────────────────────────────────────────────
+
+    // @Service
+    structure VehicleRegistrationService<applicationService> {
+        function Vehicle registerVehicle(CreateVehicleRequest request),
+        function Vehicle updateVehicle(long id, UpdateVehicleRequest request),
+        function boolean deleteVehicle(long id)
+    }
+
+    // @Service
+    structure VehicleAvailabilityService<applicationService> {
+        function Vehicles getAllVehicles,
+        function Vehicle findById(long id),
+        function Vehicles findAvailableNear(double lat, double lon, double radiusKm)
+    }
+
+    // @Service
+    structure FleetStatusService<applicationService> {
+        function Vehicle updateLocation(long id, double lat, double lon),
+        function Vehicle updateStatus(long id, VehicleStatus status)
+    }
+}

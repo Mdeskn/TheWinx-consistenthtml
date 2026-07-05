@@ -1,0 +1,133 @@
+context booking {
+
+    // ── Enumerations ───────────────────────────────────────────────────────────
+
+    enum BookingStatus {
+        ACTIVE,
+        COMPLETED,
+        CANCELLED
+    }
+
+    enum VehicleType {
+        BIKE,
+        SCOOTER,
+        CAR
+    }
+
+    enum BillingModel {
+        PER_HOUR,
+        PER_KM
+    }
+
+    // ── Value Objects ──────────────────────────────────────────────────────────
+
+    // @Embeddable
+    structure VehicleSnapshot<valueObject> {
+        immutable long vehicleId,
+        immutable VehicleType type,
+        immutable double pricePerUnit,
+        immutable BillingModel billingModel
+    }
+
+    // @Embeddable
+    structure TimeInterval<valueObject> {
+        immutable string startedAt,
+        string endedAt
+    }
+
+    // @Embeddable
+    structure RideLocation<valueObject> {
+        immutable double latitude,
+        immutable double longitude
+    }
+
+    // @Embeddable
+    structure RideSummary<valueObject> {
+        immutable double distanceKm,
+        immutable double totalCost
+    }
+
+    // ── Aggregate Root ─────────────────────────────────────────────────────────
+
+    // @Entity
+    // @Table(name = "bookings")
+    structure Booking<entity, aggregate> {
+        // @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+        immutable long bookingId<identifier>,
+        // @Column(nullable = false)
+        immutable long userId,
+        // @Embedded
+        immutable VehicleSnapshot vehicleSnapshot<part>,
+        // @Embedded
+        immutable TimeInterval interval<part>,
+        // @Embedded
+        RideLocation startLocation<part>,
+        // @Embedded
+        RideLocation endLocation<part>,
+        // @Embedded
+        RideSummary summary<part>,
+        // @Enumerated(EnumType.STRING)
+        BookingStatus status
+    }
+
+    collection Bookings {
+        Booking b
+    }
+
+    // ── DTOs ───────────────────────────────────────────────────────────────────
+
+    structure BookingCreateRequest<valueObject> {
+        immutable long vehicleId,
+        immutable double startLatitude,
+        immutable double startLongitude
+    }
+
+    structure EndRideRequest<valueObject> {
+        immutable double endLatitude,
+        immutable double endLongitude,
+        immutable double distanceKm
+    }
+
+    structure BookingDto<valueObject> {
+        immutable long bookingId,
+        immutable long userId,
+        immutable long vehicleId,
+        immutable VehicleType vehicleType,
+        immutable double pricePerUnit,
+        immutable BillingModel billingModel,
+        immutable string startedAt,
+        immutable string endedAt,
+        immutable double startLatitude,
+        immutable double startLongitude,
+        immutable double endLatitude,
+        immutable double endLongitude,
+        immutable double distanceKm,
+        immutable double totalCost,
+        immutable BookingStatus status
+    }
+
+    collection BookingDtos {
+        BookingDto d
+    }
+
+    // ── Repository ─────────────────────────────────────────────────────────────
+
+    // @Repository
+    structure BookingRepository<repository> {
+        function Booking findById(long bookingId),
+        function Bookings findByUserId(long userId),
+        function Booking findFirstByUserIdAndStatus(long userId, BookingStatus status),
+        function Booking save(Booking booking)
+    }
+
+    // ── Application Service ────────────────────────────────────────────────────
+
+    // @Service
+    structure BookingService<applicationService> {
+        function Booking createBooking(string authToken, BookingCreateRequest request),
+        function Booking cancelBooking(long bookingId),
+        function Booking endBooking(long bookingId, EndRideRequest request),
+        function Booking findById(long bookingId),
+        function Bookings findByUser(long userId)
+    }
+}

@@ -1,0 +1,43 @@
+import technology from "../technology/docker.technology" as Docker
+import technology from "../technology/eureka.technology" as Eureka
+
+@technology(Docker)
+@technology(Eureka)
+ConfigServer is Eureka::_infrastructure.Eureka {
+
+    aspects {
+        Docker::_aspects.Dockerfile('
+            FROM eclipse-temurin:21-jre
+            COPY infra-config-server-0.1.0-SNAPSHOT.jar app.jar
+            COPY config /config
+            EXPOSE 8888
+            ENTRYPOINT ["java", "-jar", "app.jar"]
+        ');
+
+        Docker::_aspects.ComposePart('
+            infra-config-server:
+                build: infra-config-server
+                image: thewinx/config-server
+                depends_on:
+                  - infra-eureka-server
+                environment:
+                  - "EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://infra-eureka-server:8761/eureka"
+                  - "SPRING_PROFILES_ACTIVE=eureka"
+                ports:
+                  - "8888:8888"
+                volumes:
+                  - "maven_repo:/root/.m2"
+        ');
+    }
+
+    default values {
+        hostname="infra-config-server"
+        port=8888
+        imageType="jre"
+        mavenGroupId="com.winx"
+        mavenArtifactId="infra-config-server"
+        mavenVersion="0.1.0-SNAPSHOT"
+        mavenName="Config Server"
+        programmingLanguage="Java"
+    }
+}

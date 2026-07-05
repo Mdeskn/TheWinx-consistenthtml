@@ -3,9 +3,8 @@ package com.winx.payment.service;
 import com.winx.payment.model.Payment;
 import com.winx.payment.model.PaymentMethod;
 import com.winx.payment.repository.PaymentRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -21,6 +20,7 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
+    @CircuitBreaker(name = "paymentGateway", fallbackMethod = "createPaymentFallback")
     public Payment createAndProcessPayment(
             Long bookingId,
             Long userId,
@@ -40,6 +40,19 @@ public class PaymentService {
             payment.markAsFailed("Payment was declined by the provider.");
         }
 
+        return paymentRepository.save(payment);
+    }
+
+    public Payment createPaymentFallback(
+            Long bookingId,
+            Long userId,
+            BigDecimal amount,
+            String currency,
+            PaymentMethod paymentMethod,
+            Throwable t
+    ) {
+        Payment payment = new Payment(bookingId, userId, amount, currency, paymentMethod);
+        payment.markAsFailed("Payment gateway unavailable. Please try again later.");
         return paymentRepository.save(payment);
     }
 

@@ -1,0 +1,19 @@
+import microservices from "fleetManagement.services" as fleetServices
+import technology from "../technology/docker.technology" as Docker
+import technology from "../technology/javaWithSpring.technology" as java
+
+@technology(Docker)
+@technology(java)
+container FleetManagementContainer deployment technology Docker::_deployment.Docker
+    deploys fleetServices::com.winx.fleet.FleetManagement {
+
+    aspects {
+        Docker::_aspects.Dockerfile('FROM eclipse-temurin:21-jre COPY bc02-fleet-management-0.1.0-SNAPSHOT.jar app.jar EXPOSE 8082 ENTRYPOINT ["java", "-jar", "app.jar"]');
+    }
+
+    fleetServices::com.winx.fleet.FleetManagement {
+        basic endpoints {
+            java::_protocols.rest: "http://localhost:8082";
+        }
+    }
+}

@@ -1,0 +1,81 @@
+import datatypes from "fleetManagement.data" as domain
+
+public functional microservice com.winx.fleet.FleetManagement {
+
+    interface vehicleRegistration {
+        ---
+        Register a new vehicle in the fleet.
+        ---
+        registerVehicle(
+            sync requestDto : domain::fleetManagement.CreateVehicleRequest,
+            sync out responseDto : domain::fleetManagement.VehicleResponse,
+            sync out fault invalidVehicle : string
+        );
+
+        ---
+        Update vehicle details.
+        ---
+        updateVehicle(
+            sync vehicleId : long,
+            sync requestDto : domain::fleetManagement.UpdateVehicleRequest,
+            sync out responseDto : domain::fleetManagement.VehicleResponse,
+            sync out fault notFound : string
+        );
+
+        ---
+        Remove a vehicle from the fleet.
+        ---
+        deleteVehicle(
+            sync vehicleId : long,
+            sync out fault notFound : string
+        );
+    }
+
+    interface vehicleQuery {
+        ---
+        Retrieve all registered vehicles.
+        ---
+        getAllVehicles(sync out vehicles : domain::fleetManagement.VehicleResponses);
+
+        ---
+        Retrieve a single vehicle by its ID.
+        ---
+        getVehicleById(
+            sync vehicleId : long,
+            sync out responseDto : domain::fleetManagement.VehicleResponse,
+            sync out fault notFound : string
+        );
+
+        ---
+        Find available vehicles near a given geographic position.
+        ---
+        findAvailableNear(
+            sync lat : double,
+            sync lon : double,
+            sync radiusKm : double,
+            sync out vehicles : domain::fleetManagement.VehicleResponses
+        );
+    }
+
+    interface fleetStatus {
+        ---
+        Update the current GPS location of a vehicle.
+        ---
+        updateLocation(
+            sync vehicleId : long,
+            sync requestDto : domain::fleetManagement.UpdateLocationRequest,
+            sync out responseDto : domain::fleetManagement.VehicleResponse,
+            sync out fault notFound : string
+        );
+
+        ---
+        Change the operational status of a vehicle (e.g., AVAILABLE, BOOKED, MAINTENANCE).
+        ---
+        updateStatus(
+            sync vehicleId : long,
+            sync requestDto : domain::fleetManagement.UpdateStatusRequest,
+            sync out responseDto : domain::fleetManagement.VehicleResponse,
+            sync out fault notFound : string
+        );
+    }
+}

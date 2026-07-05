@@ -1,0 +1,61 @@
+import datatypes from "booking.data" as domain
+
+public functional microservice com.winx.booking.BookingCore {
+
+    interface bookingLifecycle {
+        ---
+        Start a new booking for the authenticated user. Validates the user via
+        BC-01 (identity), checks vehicle availability via BC-02 (fleet), and
+        marks the vehicle as BOOKED on success.
+        ---
+        createBooking(
+            sync authToken : string,
+            sync requestDto : domain::booking.BookingCreateRequest,
+            sync out responseDto : domain::booking.BookingDto,
+            sync out fault vehicleNotAvailable : string,
+            sync out fault activeBookingExists : string,
+            sync out fault dependencyUnavailable : string
+        );
+
+        ---
+        Cancel an active booking and release the vehicle back to AVAILABLE.
+        ---
+        cancelBooking(
+            sync bookingId : long,
+            sync out responseDto : domain::booking.BookingDto,
+            sync out fault notFound : string,
+            sync out fault invalidState : string
+        );
+
+        ---
+        Complete a ride: record end location, distance, and compute total cost.
+        Releases the vehicle and publishes a BookingCompleted event for BC-04.
+        ---
+        endBooking(
+            sync bookingId : long,
+            sync requestDto : domain::booking.EndRideRequest,
+            sync out responseDto : domain::booking.BookingDto,
+            sync out fault notFound : string,
+            sync out fault invalidState : string
+        );
+    }
+
+    interface bookingQuery {
+        ---
+        Retrieve a booking by its ID.
+        ---
+        getBookingById(
+            sync bookingId : long,
+            sync out responseDto : domain::booking.BookingDto,
+            sync out fault notFound : string
+        );
+
+        ---
+        Retrieve all bookings for a given user.
+        ---
+        getBookingsByUser(
+            sync userId : long,
+            sync out bookings : domain::booking.BookingDtos
+        );
+    }
+}
