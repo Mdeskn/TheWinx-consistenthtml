@@ -46,17 +46,24 @@ public class BookingWebController {
     }
 
     @PostMapping("/bookings/create")
-    public String create(@RequestParam String token,
+    public String create(@RequestParam(required = false) String token,
                          @RequestParam Long vehicleId,
                          @RequestParam Double startLatitude,
                          @RequestParam Double startLongitude,
                          RedirectAttributes ra) {
+        if (token == null || token.isBlank()) {
+            ra.addFlashAttribute("error", "Please enter your username in the Auth Token field before booking.");
+            return "redirect:/ui/search";
+        }
         try {
             Booking booking = service.createBooking(token,
                     new BookingCreateRequest(vehicleId, startLatitude, startLongitude, null));
             return "redirect:/ui/bookings?userId=" + booking.getUserId();
         } catch (DomainException e) {
             ra.addFlashAttribute("error", e.getMessage());
+            return "redirect:/ui/search";
+        } catch (Exception e) {
+            ra.addFlashAttribute("error", "Booking failed: " + e.getMessage());
             return "redirect:/ui/search";
         }
     }
