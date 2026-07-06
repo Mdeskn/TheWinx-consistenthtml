@@ -56,7 +56,7 @@
                 <thead>
                 <tr>
                     <th>ID</th><th>Name</th><th>Type</th><th>Description</th>
-                    <th>Status</th><th>Price / Day</th><th>Billing</th><th>Location</th>
+                    <th>Status</th><th>Price / Unit</th><th>Billing</th><th>Location</th>
                 </tr>
                 </thead>
                 <tbody id="resultsBody"></tbody>
@@ -93,7 +93,7 @@ function renderResults(vehicles) {
         const statusClass = v.status === "AVAILABLE" ? "status-available" : "status-booked";
         const row = document.createElement("tr");
         row.innerHTML = `
-            <td>${v.id}</td>
+            <td>${v.vehicleId}</td>
             <td><strong>${v.name || "-"}</strong></td>
             <td>${v.type}</td>
             <td>${v.description || "-"}</td>

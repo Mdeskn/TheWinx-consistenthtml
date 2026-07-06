@@ -68,6 +68,9 @@
         <h2>Vehicle List</h2>
 
         <div class="form-grid" style="margin-bottom:1rem;">
+            <label>Filter by Provider ID
+                <input type="number" id="providerFilter" placeholder="All providers" min="1">
+            </label>
             <label>Filter by Type
                 <select id="typeFilter">
                     <option value="">All Types</option>
@@ -110,6 +113,7 @@ let vehicles = [];
 
 document.addEventListener("DOMContentLoaded", () => {
     loadVehicles();
+    document.getElementById("providerFilter").addEventListener("input", renderVehicles);
     document.getElementById("typeFilter").addEventListener("change", renderVehicles);
     document.getElementById("statusFilter").addEventListener("change", renderVehicles);
 });
@@ -129,11 +133,13 @@ async function loadVehicles() {
 }
 
 function renderVehicles() {
-    const tbody      = document.getElementById("vehicleTableBody");
-    const typeFilter = document.getElementById("typeFilter").value;
-    const statFilter = document.getElementById("statusFilter").value;
+    const tbody          = document.getElementById("vehicleTableBody");
+    const providerFilter = document.getElementById("providerFilter").value;
+    const typeFilter     = document.getElementById("typeFilter").value;
+    const statFilter     = document.getElementById("statusFilter").value;
 
     let filtered = vehicles
+        .filter(v => !providerFilter || String(v.providerId) === providerFilter)
         .filter(v => !typeFilter || v.type === typeFilter)
         .filter(v => !statFilter || v.status === statFilter);
 
@@ -195,9 +201,11 @@ function renderVehicles() {
 }
 
 function updateStats() {
-    document.getElementById("totalVehicles").textContent     = vehicles.length;
-    document.getElementById("availableVehicles").textContent = vehicles.filter(v => v.status === "AVAILABLE").length;
-    document.getElementById("bookedVehicles").textContent    = vehicles.filter(v => v.status === "BOOKED").length;
+    const providerFilter = document.getElementById("providerFilter").value;
+    const scoped = providerFilter ? vehicles.filter(v => String(v.providerId) === providerFilter) : vehicles;
+    document.getElementById("totalVehicles").textContent     = scoped.length;
+    document.getElementById("availableVehicles").textContent = scoped.filter(v => v.status === "AVAILABLE").length;
+    document.getElementById("bookedVehicles").textContent    = scoped.filter(v => v.status === "BOOKED").length;
 }
 
 async function updateStatus(id, newStatus) {

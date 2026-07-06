@@ -1,11 +1,13 @@
 package com.winx.fleet.controller;
 
+import com.winx.fleet.dto.CreateVehicleRequest;
 import com.winx.fleet.dto.StatusUpdate;
 import com.winx.fleet.dto.VehicleResponse;
 import com.winx.fleet.model.Vehicle;
 import com.winx.fleet.model.VehicleStatus;
 import com.winx.fleet.repository.VehicleRepository;
 import com.winx.fleet.service.VehicleAvailabilityService;
+import com.winx.fleet.service.VehicleRegistrationService;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -18,16 +20,19 @@ public class VehicleController {
 
     private final VehicleRepository vehicleRepository;
     private final VehicleAvailabilityService availabilityService;
+    private final VehicleRegistrationService registrationService;
 
     public VehicleController(VehicleRepository vehicleRepository,
-                             VehicleAvailabilityService availabilityService) {
+                             VehicleAvailabilityService availabilityService,
+                             VehicleRegistrationService registrationService) {
         this.vehicleRepository = vehicleRepository;
         this.availabilityService = availabilityService;
+        this.registrationService = registrationService;
     }
 
     @PostMapping
-    public Vehicle addVehicle(@RequestBody Vehicle vehicle) {
-        return vehicleRepository.save(vehicle);
+    public VehicleResponse addVehicle(@RequestBody CreateVehicleRequest request) {
+        return VehicleResponse.from(registrationService.createVehicle(request));
     }
 
     @GetMapping

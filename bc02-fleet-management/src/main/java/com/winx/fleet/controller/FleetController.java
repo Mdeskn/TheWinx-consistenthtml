@@ -4,6 +4,7 @@ import com.winx.fleet.dto.CreateVehicleRequest;
 import com.winx.fleet.dto.UpdateLocationRequest;
 import com.winx.fleet.dto.UpdateStatusRequest;
 import com.winx.fleet.dto.UpdateVehicleRequest;
+import com.winx.fleet.dto.VehicleResponse;
 import com.winx.fleet.model.Vehicle;
 import com.winx.fleet.service.FleetStatusService;
 import com.winx.fleet.service.VehicleAvailabilityService;
@@ -66,10 +67,11 @@ public class FleetController {
 
     // FIND AVAILABLE NEAR
     @GetMapping("/vehicles/near")
-    public List<Vehicle> findNear(@RequestParam Double lat,
+    public List<VehicleResponse> findNear(@RequestParam Double lat,
             @RequestParam Double lon,
             @RequestParam Double radius) {
-        return availabilityService.findAvailableNear(lat, lon, radius);
+        return availabilityService.findAvailableNear(lat, lon, radius)
+                .stream().map(VehicleResponse::from).toList();
     }
 
     // DELETE VEHICLE
