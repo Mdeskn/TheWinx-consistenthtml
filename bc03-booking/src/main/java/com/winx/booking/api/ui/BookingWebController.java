@@ -56,7 +56,7 @@ public class BookingWebController {
                          @RequestParam Double startLongitude,
                          RedirectAttributes ra) {
         if (token == null || token.isBlank()) {
-            ra.addFlashAttribute("error", "Please enter your username in the Auth Token field before booking.");
+            ra.addFlashAttribute("error", "Please enter your username in the Username field before booking.");
             return "redirect:/ui/search";
         }
         try {

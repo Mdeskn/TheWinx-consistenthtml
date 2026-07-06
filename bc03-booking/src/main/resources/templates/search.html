@@ -101,7 +101,11 @@
                             <input type="hidden" name="startLatitude"   th:value="${lat}">
                             <input type="hidden" name="startLongitude"  th:value="${lon}">
                             <input type="hidden" name="token"           th:value="${token}">
-                            <button type="submit" th:disabled="${v.status() != 'AVAILABLE'}">Book</button>
+                            <button type="submit"
+                    th:disabled="${v.status() != 'AVAILABLE'}"
+                    th:classappend="${token == null or token.isBlank()} ? 'btn-requires-login'"
+                    th:title="${token == null or token.isBlank()} ? 'Enter your username above first' : ''"
+                    onclick="if(!document.getElementById('token').value.trim()){alert('Enter your username in the Username field above first.');return false;}">Book</button>
                         </form>
                     </td>
                 </tr>
