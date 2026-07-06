@@ -71,6 +71,14 @@
             <label>Min. Persons needed
                 <input type="number" id="minPersons" name="minPersons" th:value="${minPersons}" placeholder="1" min="1">
             </label>
+            <label>Payment Method
+                <select id="paymentMethod" name="paymentMethod">
+                    <option value="CARD"           th:selected="${paymentMethod == 'CARD' or paymentMethod == null}">Credit / Debit Card</option>
+                    <option value="PAYPAL"          th:selected="${paymentMethod == 'PAYPAL'}">PayPal</option>
+                    <option value="BANK_TRANSFER"   th:selected="${paymentMethod == 'BANK_TRANSFER'}">Bank Transfer</option>
+                    <option value="CASH"            th:selected="${paymentMethod == 'CASH'}">Cash</option>
+                </select>
+            </label>
             <div th:if="${loggedInUser != null}" class="login-status login-ok">
                 Logged in as <strong th:text="${loggedInUser}">user</strong>
             </div>
@@ -112,6 +120,7 @@
                             <input type="hidden" name="vehicleId"      th:value="${v.vehicleId()}">
                             <input type="hidden" name="startLatitude"  th:value="${lat}">
                             <input type="hidden" name="startLongitude" th:value="${lon}">
+                            <input type="hidden" name="paymentMethod"  th:value="${paymentMethod != null ? paymentMethod : 'CARD'}">
                             <button type="submit"
                                     th:disabled="${v.status() != 'AVAILABLE' or loggedInUser == null}"
                                     th:title="${loggedInUser == null} ? 'Log in at BC-01 first' : ''">Book</button>

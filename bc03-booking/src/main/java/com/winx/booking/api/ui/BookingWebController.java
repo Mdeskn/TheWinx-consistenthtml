@@ -31,6 +31,7 @@ public class BookingWebController {
                          @RequestParam(required = false) String type,
                          @RequestParam(required = false) java.math.BigDecimal maxPrice,
                          @RequestParam(required = false) Integer minPersons,
+                         @RequestParam(required = false, defaultValue = "CARD") String paymentMethod,
                          @CookieValue(name = "winx-username", required = false) String cookieUsername,
                          Model model) {
         DemoLocations.Location loc = DemoLocations.find(location);
@@ -46,6 +47,7 @@ public class BookingWebController {
         model.addAttribute("type", type);
         model.addAttribute("maxPrice", maxPrice);
         model.addAttribute("minPersons", minPersons);
+        model.addAttribute("paymentMethod", paymentMethod);
         model.addAttribute("loggedInUser", cookieUsername);
         return "search";
     }
@@ -56,6 +58,7 @@ public class BookingWebController {
                          @RequestParam Long vehicleId,
                          @RequestParam Double startLatitude,
                          @RequestParam Double startLongitude,
+                         @RequestParam(required = false, defaultValue = "CARD") String paymentMethod,
                          RedirectAttributes ra) {
         String effectiveToken = (token != null && !token.isBlank()) ? token : cookieUsername;
         if (effectiveToken == null || effectiveToken.isBlank()) {
@@ -64,7 +67,7 @@ public class BookingWebController {
         }
         try {
             Booking booking = service.createBooking(effectiveToken,
-                    new BookingCreateRequest(vehicleId, startLatitude, startLongitude, null));
+                    new BookingCreateRequest(vehicleId, startLatitude, startLongitude, paymentMethod));
             return "redirect:/ui/bookings?userId=" + booking.getUserId();
         } catch (DomainException e) {
             ra.addFlashAttribute("error", e.getMessage());

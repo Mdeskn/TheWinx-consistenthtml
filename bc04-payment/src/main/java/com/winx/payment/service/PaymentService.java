@@ -8,13 +8,11 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Random;
 
 @Service
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
-    private final Random random = new Random();
 
     public PaymentService(PaymentRepository paymentRepository) {
         this.paymentRepository = paymentRepository;
@@ -31,15 +29,7 @@ public class PaymentService {
         Payment payment = new Payment(bookingId, userId, amount, currency, paymentMethod);
 
         paymentRepository.save(payment);
-
-        boolean paymentSuccessful = random.nextBoolean();
-
-        if (paymentSuccessful) {
-            payment.markAsPaid();
-        } else {
-            payment.markAsFailed("Payment was declined by the provider.");
-        }
-
+        payment.markAsPaid();
         return paymentRepository.save(payment);
     }
 

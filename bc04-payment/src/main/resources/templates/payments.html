@@ -58,7 +58,10 @@
                     <td th:text="${payment.userId}"></td>
                     <td th:text="${payment.amount}"></td>
                     <td th:text="${payment.currency}"></td>
-                    <td th:text="${payment.paymentMethod}"></td>
+                    <td th:text="${payment.paymentMethod.name() == 'CARD'} ? 'Credit / Debit Card' :
+                               (${payment.paymentMethod.name() == 'PAYPAL'} ? 'PayPal' :
+                               (${payment.paymentMethod.name() == 'BANK_TRANSFER'} ? 'Bank Transfer' :
+                               (${payment.paymentMethod.name() == 'CASH'} ? 'Cash' : payment.paymentMethod)))"></td>
                     <td>
                         <span class="status"
                               th:classappend="${payment.status.name() == 'PAID'} ? 'status-active' :
