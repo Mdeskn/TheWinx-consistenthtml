@@ -81,7 +81,7 @@
             </label>
             <div th:if="${loggedInUser != null}" class="login-status login-ok">
                 Logged in as <strong th:text="${loggedInUser}">user</strong>
-                &nbsp;·&nbsp; <a href="http://localhost:8081/ui/logout" style="color:inherit;font-weight:600;">Log out</a>
+                &nbsp;·&nbsp; <a href="http://localhost:8081/ui/logout" style="color:inherit;font-weight:600;">Sign out</a>
             </div>
             <div th:if="${loggedInUser == null}" class="login-status login-warn">
                 Not logged in &mdash; <a href="http://localhost:8081/ui/login">log in at BC-01</a> to book
