@@ -21,7 +21,6 @@
         .detail-panel dl { margin: 0; }
         .detail-panel dt { font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; opacity: .6; margin-bottom: .1rem; }
         .detail-panel dd { margin: 0; font-weight: 600; }
-        .detail-panel .book-btn { grid-column: 1 / -1; margin-top: .5rem; }
     </style>
 </head>
 <body>
@@ -178,9 +177,6 @@ function renderVehicles() {
                     <dl><dt>Min Age</dt><dd>${v.minAge ?? "-"}</dd></dl>
                     <dl><dt>Max Persons</dt><dd>${v.maxPersons ?? "-"}</dd></dl>
                     <dl><dt>Location</dt><dd>${lat}, ${lon}</dd></dl>
-                    <div class="book-btn">
-                        <a class="link-button" href="http://localhost:8081/ui/dashboard">Book via User Dashboard (BC-01)</a>
-                    </div>
                 </div>
             </td>`;
         tbody.appendChild(detailRow);
