@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -153,8 +155,12 @@ public class IdentityUiController {
     }
 
     @GetMapping("/ui/logout")
-    public String logout(HttpSession session) {
+    public String logout(HttpSession session, HttpServletResponse httpResponse) {
         session.invalidate();
+        Cookie userCookie = new Cookie("winx-username", "");
+        userCookie.setPath("/");
+        userCookie.setMaxAge(0);
+        httpResponse.addCookie(userCookie);
         return "redirect:/ui/login";
     }
 
@@ -162,6 +168,7 @@ public class IdentityUiController {
     public String login(@RequestParam String username,
                         @RequestParam String password,
                         HttpSession session,
+                        HttpServletResponse httpResponse,
                         Model model) {
         try {
             AuthResponse response = AuthResponse.from(identityAccessService.authenticate(username, password));
@@ -172,6 +179,11 @@ public class IdentityUiController {
                     .map(u -> u.getId()).orElse(null);
             session.setAttribute("username", username);
             session.setAttribute("userId", userId);
+
+            Cookie userCookie = new Cookie("winx-username", username);
+            userCookie.setPath("/");
+            userCookie.setMaxAge(86400);
+            httpResponse.addCookie(userCookie);
 
             return isAdmin ? "redirect:/" : "redirect:/ui/dashboard";
         } catch (UnauthorizedException e) {

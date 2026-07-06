@@ -10,6 +10,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,7 +31,7 @@ public class BookingWebController {
                          @RequestParam(required = false) String type,
                          @RequestParam(required = false) java.math.BigDecimal maxPrice,
                          @RequestParam(required = false) Integer minPersons,
-                         @RequestParam(required = false) String token,
+                         @CookieValue(name = "winx-username", required = false) String cookieUsername,
                          Model model) {
         DemoLocations.Location loc = DemoLocations.find(location);
         String resolvedType = (type != null && !type.isBlank()) ? type : null;
@@ -45,22 +46,24 @@ public class BookingWebController {
         model.addAttribute("type", type);
         model.addAttribute("maxPrice", maxPrice);
         model.addAttribute("minPersons", minPersons);
-        model.addAttribute("token", token);
+        model.addAttribute("loggedInUser", cookieUsername);
         return "search";
     }
 
     @PostMapping("/bookings/create")
     public String create(@RequestParam(required = false) String token,
+                         @CookieValue(name = "winx-username", required = false) String cookieUsername,
                          @RequestParam Long vehicleId,
                          @RequestParam Double startLatitude,
                          @RequestParam Double startLongitude,
                          RedirectAttributes ra) {
-        if (token == null || token.isBlank()) {
-            ra.addFlashAttribute("error", "Please enter your username in the Username field before booking.");
+        String effectiveToken = (token != null && !token.isBlank()) ? token : cookieUsername;
+        if (effectiveToken == null || effectiveToken.isBlank()) {
+            ra.addFlashAttribute("error", "You must be logged in at BC-01 to book a vehicle.");
             return "redirect:/ui/search";
         }
         try {
-            Booking booking = service.createBooking(token,
+            Booking booking = service.createBooking(effectiveToken,
                     new BookingCreateRequest(vehicleId, startLatitude, startLongitude, null));
             return "redirect:/ui/bookings?userId=" + booking.getUserId();
         } catch (DomainException e) {

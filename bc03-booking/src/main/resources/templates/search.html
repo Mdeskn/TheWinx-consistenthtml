@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Booking · Search Vehicles</title>
     <link rel="stylesheet" href="http://localhost:8080/styles.css">
+    <style>
+        .login-status { grid-column: 1 / -1; padding: .55rem .9rem; border-radius: 6px; font-size: .9rem; }
+        .login-ok   { background: #d1fae5; color: #065f46; }
+        .login-warn { background: #fef3c7; color: #92400e; }
+        @media (prefers-color-scheme: dark) {
+            .login-ok  { background: #064e3b; color: #6ee7b7; }
+            .login-warn{ background: #78350f; color: #fde68a; }
+        }
+    </style>
 </head>
 <body>
 <main class="container">
@@ -62,9 +71,12 @@
             <label>Min. Persons needed
                 <input type="number" id="minPersons" name="minPersons" th:value="${minPersons}" placeholder="1" min="1">
             </label>
-            <label>Username <small style="font-weight:400;opacity:.7">(required to book)</small>
-                <input type="text" id="token" name="token" th:value="${token}" placeholder="e.g. demo.user">
-            </label>
+            <div th:if="${loggedInUser != null}" class="login-status login-ok">
+                Logged in as <strong th:text="${loggedInUser}">user</strong>
+            </div>
+            <div th:if="${loggedInUser == null}" class="login-status login-warn">
+                Not logged in &mdash; <a href="http://localhost:8081/ui/login">log in at BC-01</a> to book
+            </div>
             <nav class="form-full btn-row">
                 <button type="submit">Search</button>
             </nav>
@@ -97,15 +109,12 @@
                     <td th:text="${v.maxPersons() != null ? v.maxPersons() : '-'}">1</td>
                     <td>
                         <form method="post" th:action="@{/ui/bookings/create}">
-                            <input type="hidden" name="vehicleId"       th:value="${v.vehicleId()}">
-                            <input type="hidden" name="startLatitude"   th:value="${lat}">
-                            <input type="hidden" name="startLongitude"  th:value="${lon}">
-                            <input type="hidden" name="token"           th:value="${token}">
+                            <input type="hidden" name="vehicleId"      th:value="${v.vehicleId()}">
+                            <input type="hidden" name="startLatitude"  th:value="${lat}">
+                            <input type="hidden" name="startLongitude" th:value="${lon}">
                             <button type="submit"
-                    th:disabled="${v.status() != 'AVAILABLE'}"
-                    th:classappend="${token == null or token.isBlank()} ? 'btn-requires-login'"
-                    th:title="${token == null or token.isBlank()} ? 'Enter your username above first' : ''"
-                    onclick="if(!document.getElementById('token').value.trim()){alert('Enter your username in the Username field above first.');return false;}">Book</button>
+                                    th:disabled="${v.status() != 'AVAILABLE' or loggedInUser == null}"
+                                    th:title="${loggedInUser == null} ? 'Log in at BC-01 first' : ''">Book</button>
                         </form>
                     </td>
                 </tr>
