@@ -9,14 +9,16 @@ context booking {
     }
 
     enum VehicleType {
-        BIKE,
-        SCOOTER,
-        CAR
+        E_SCOOTER,
+        BICYCLE,
+        E_BIKE,
+        E_CAR
     }
 
     enum BillingModel {
         PER_HOUR,
-        PER_KM
+        PER_KILOMETER,
+        PER_DAY
     }
 
     // ── Value Objects ──────────────────────────────────────────────────────────
@@ -24,6 +26,7 @@ context booking {
     // @Embeddable
     structure VehicleSnapshot<valueObject> {
         immutable long vehicleId,
+        immutable long providerId,
         immutable VehicleType type,
         immutable double pricePerUnit,
         immutable BillingModel billingModel
@@ -47,6 +50,21 @@ context booking {
         immutable double totalCost
     }
 
+    // Read model for vehicle search results fetched from BC-02
+    structure VehicleDto<valueObject> {
+        immutable long vehicleId,
+        immutable long providerId,
+        immutable string type,
+        immutable string description,
+        immutable string status,
+        immutable double pricePerUnit,
+        immutable string billingModel,
+        immutable int minAge,
+        immutable int maxPersons
+    }
+
+    collection VehicleDtos { VehicleDto v }
+
     // ── Aggregate Root ─────────────────────────────────────────────────────────
 
     // @Entity
@@ -66,20 +84,21 @@ context booking {
         RideLocation endLocation<part>,
         // @Embedded
         RideSummary summary<part>,
+        // @Column(name = "payment_method")
+        string paymentMethod,
         // @Enumerated(EnumType.STRING)
         BookingStatus status
     }
 
-    collection Bookings {
-        Booking b
-    }
+    collection Bookings { Booking b }
 
     // ── DTOs ───────────────────────────────────────────────────────────────────
 
     structure BookingCreateRequest<valueObject> {
         immutable long vehicleId,
         immutable double startLatitude,
-        immutable double startLongitude
+        immutable double startLongitude,
+        immutable string paymentMethod
     }
 
     structure EndRideRequest<valueObject> {
@@ -106,9 +125,7 @@ context booking {
         immutable BookingStatus status
     }
 
-    collection BookingDtos {
-        BookingDto d
-    }
+    collection BookingDtos { BookingDto d }
 
     // ── Repository ─────────────────────────────────────────────────────────────
 
@@ -128,6 +145,8 @@ context booking {
         function Booking cancelBooking(long bookingId),
         function Booking endBooking(long bookingId, EndRideRequest request),
         function Booking findById(long bookingId),
-        function Bookings findByUser(long userId)
+        function Bookings findByUser(long userId),
+        function VehicleDtos searchVehicles(double lat, double lon, double radiusKm,
+            string type, double maxPrice, int minPersons)
     }
 }

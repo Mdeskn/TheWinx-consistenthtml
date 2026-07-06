@@ -16,7 +16,6 @@ context IdentityAccess {
         // @Column(nullable = false, unique = true, length = 50)
         string name,
         // @ElementCollection(fetch = FetchType.EAGER)
-        // @CollectionTable(name = "role_permissions", joinColumns = @JoinColumn(name = "role_id"))
         Permissions permissions
     }
 
@@ -32,6 +31,14 @@ context IdentityAccess {
         string email,
         // @Column(nullable = false)
         string passwordHash,
+        // @Column
+        string firstName,
+        // @Column
+        string lastName,
+        // @Column
+        string phoneNumber,
+        // @Column
+        date dateOfBirth,
         // @Enumerated(EnumType.STRING) @Column(nullable = false, length = 20)
         AccountStatus status,
         // @ManyToMany(fetch = FetchType.EAGER)
@@ -52,33 +59,45 @@ context IdentityAccess {
     }
 
     structure IdentityAccessService<applicationService> {
-        function UserAccount register(string username, string email, string plainPassword),
+        function UserAccount register(string username, string email, string plainPassword,
+            string firstName, string lastName, string phoneNumber, date dateOfBirth),
         function UserAccount updateUser(long userId, string username, string email),
         function UserAccount deactivateUser(long userId),
         function UserAccount assignRole(long userId, string roleName),
-        function UserAccount revokeRole(long userId, string roleName),
         function AuthResponse authenticate(string username, string plainPassword),
         function boolean hasPermission(long userId, string permission)
     }
 
+    // Returned by GET /api/auth/validate — used by BC-03 to resolve the requesting user
+    structure PrincipalDto<valueObject> {
+        immutable long id,
+        immutable string username,
+        immutable date dateOfBirth,
+        immutable Permissions permissions
+    }
+
     structure RegisterUserRequest<valueObject> {
-        immutable string username<neverEmpty>,
-        immutable string email<neverEmpty>,
-        immutable string password<neverEmpty>
+        immutable string username,
+        immutable string email,
+        immutable string password,
+        immutable string firstName,
+        immutable string lastName,
+        immutable string phoneNumber,
+        immutable date dateOfBirth
     }
 
     structure UpdateUserRequest<valueObject> {
-        immutable string username<neverEmpty>,
-        immutable string email<neverEmpty>
+        immutable string username,
+        immutable string email
     }
 
     structure RoleAssignmentRequest<valueObject> {
-        immutable string roleName<neverEmpty>
+        immutable string roleName
     }
 
     structure AuthRequest<valueObject> {
-        immutable string username<neverEmpty>,
-        immutable string password<neverEmpty>
+        immutable string username,
+        immutable string password
     }
 
     structure AuthResponse<valueObject> {
@@ -92,6 +111,10 @@ context IdentityAccess {
         immutable long id,
         immutable string username,
         immutable string email,
+        immutable string firstName,
+        immutable string lastName,
+        immutable string phoneNumber,
+        immutable date dateOfBirth,
         immutable AccountStatus status,
         immutable RoleNames roles
     }
@@ -102,11 +125,6 @@ context IdentityAccess {
         immutable long userId,
         immutable string permission,
         immutable boolean granted
-    }
-
-    structure ApiErrorResponse<valueObject> {
-        immutable string message,
-        immutable date timestamp
     }
 
     structure BookingIdentityCheckResponse<valueObject> {
@@ -141,11 +159,7 @@ context IdentityAccess {
     structure BookingInfo<valueObject> {
         immutable long id,
         immutable long vehicleId,
-        immutable string vehicleName,
-        immutable string plate,
         immutable string username,
-        immutable date pickupDate,
-        immutable date returnDate,
         immutable string status
     }
 
@@ -153,8 +167,6 @@ context IdentityAccess {
 
     structure VehicleBookingRequest<valueObject> {
         immutable long vehicleId,
-        immutable string username<neverEmpty>,
-        immutable date pickupDate,
-        immutable date returnDate
+        immutable string username
     }
 }

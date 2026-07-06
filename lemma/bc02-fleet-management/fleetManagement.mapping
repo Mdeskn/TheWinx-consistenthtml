@@ -175,6 +175,15 @@ fleetServices::com.winx.fleet.FleetManagement {
             primitive radiusKm {
                 aspects { java::_aspects.RequestParam; }
             }
+            primitive vehicleType {
+                aspects { java::_aspects.RequestParam; }
+            }
+            primitive maxPrice {
+                aspects { java::_aspects.RequestParam; }
+            }
+            primitive minPersons {
+                aspects { java::_aspects.RequestParam; }
+            }
         }
     }
 

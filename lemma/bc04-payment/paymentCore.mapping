@@ -149,4 +149,48 @@ paymentCoreServices::com.winx.payment.PaymentCore {
             }
         }
     }
+
+    operation paymentInformationHolder.getPaymentsByUser {
+        endpoints {
+            java::_protocols.rest: "/user/{userId}";
+        }
+
+        aspects {
+            java::_aspects.GetMapping;
+        }
+
+        parameters {
+            primitive userId {
+                aspects {
+                    java::_aspects.PathVariable;
+                }
+            }
+        }
+    }
+
+    operation paymentInformationHolder.cancelPayment {
+        endpoints {
+            java::_protocols.rest: "/booking/{bookingId}/cancel";
+        }
+
+        aspects {
+            java::_aspects.PostMapping;
+        }
+
+        parameters {
+            primitive bookingId {
+                aspects {
+                    java::_aspects.PathVariable;
+                }
+            }
+
+            complex responseDto : java::_types.ResponseEntity;
+
+            primitive paymentNotFound {
+                aspects {
+                    java::_aspects.ResponseStatus("NOT_FOUND");
+                }
+            }
+        }
+    }
 }

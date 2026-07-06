@@ -74,5 +74,15 @@ public functional microservice com.winx.rating.RatingCore {
             sync providerId : long,
             sync out ratings : domain::ratingCore.RatingResponses
         );
+
+        ---
+        Get the average provider score for a specific provider.
+
+        @required providerId the provider identifier
+        ---
+        getAverageProviderScore(
+            sync providerId : long,
+            sync out average : double
+        );
     }
 }

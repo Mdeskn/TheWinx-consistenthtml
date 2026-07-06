@@ -48,6 +48,12 @@ type bookingServices::domain::booking.BookingDto {
 }
 
 @technology(java)
+@technology(map)
+type bookingServices::domain::booking.VehicleDto {
+    aspects { map::_aspects.AtomicParameterList; }
+}
+
+@technology(java)
 type bookingServices::domain::booking.BookingRepository {
 }
 
@@ -86,6 +92,10 @@ bookingServices::com.winx.booking.BookingCore {
     }
 
     interface bookingQuery {
+        aspects { map::_aspects.InformationHolderResource; }
+    }
+
+    interface vehicleSearch {
         aspects { map::_aspects.InformationHolderResource; }
     }
 
@@ -171,6 +181,31 @@ bookingServices::com.winx.booking.BookingCore {
         parameters {
             primitive userId {
                 aspects { java::_aspects.PathVariable; }
+            }
+        }
+    }
+
+    operation vehicleSearch.searchVehicles {
+        endpoints { java::_protocols.rest: "/api/v1/vehicles/search"; }
+        aspects { java::_aspects.GetMapping; }
+        parameters {
+            primitive lat {
+                aspects { java::_aspects.RequestParam; }
+            }
+            primitive lon {
+                aspects { java::_aspects.RequestParam; }
+            }
+            primitive radiusKm {
+                aspects { java::_aspects.RequestParam; }
+            }
+            primitive vehicleType {
+                aspects { java::_aspects.RequestParam; }
+            }
+            primitive maxPrice {
+                aspects { java::_aspects.RequestParam; }
+            }
+            primitive minPersons {
+                aspects { java::_aspects.RequestParam; }
             }
         }
     }

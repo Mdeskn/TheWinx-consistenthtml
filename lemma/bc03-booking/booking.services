@@ -8,8 +8,8 @@ public functional microservice com.winx.booking.BookingCore {
         BC-01 (identity), checks vehicle availability via BC-02 (fleet), and
         marks the vehicle as BOOKED on success.
 
-        @required authToken the authentication token identifying the requesting user
-        @required requestDto the booking request containing vehicleId and start location
+        @required authToken the username identifying the requesting user (from cookie or header)
+        @required requestDto the booking request containing vehicleId, start location, and payment method
         ---
         createBooking(
             sync authToken : string,
@@ -67,6 +67,29 @@ public functional microservice com.winx.booking.BookingCore {
         getBookingsByUser(
             sync userId : long,
             sync out bookings : domain::booking.BookingDtos
+        );
+    }
+
+    interface vehicleSearch {
+        ---
+        Proxy endpoint that searches available vehicles from BC-02 Fleet Management
+        and returns filtered results to the booking UI.
+
+        @required lat latitude of the search center point
+        @required lon longitude of the search center point
+        @required radiusKm search radius in kilometers
+        @param vehicleType optional vehicle type filter
+        @param maxPrice optional maximum price per unit in EUR
+        @param minPersons optional minimum passenger capacity
+        ---
+        searchVehicles(
+            sync lat : double,
+            sync lon : double,
+            sync radiusKm : double,
+            sync vehicleType? : string,
+            sync maxPrice? : double,
+            sync minPersons? : int,
+            sync out vehicles : domain::booking.VehicleDtos
         );
     }
 }

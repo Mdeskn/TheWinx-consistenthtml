@@ -1,4 +1,5 @@
 context ratingCore {
+
     // ── Value Objects ──────────────────────────────────────────────────────────
 
     // @Embeddable
@@ -30,7 +31,7 @@ context ratingCore {
     // ── Aggregate Root ─────────────────────────────────────────────────────────
 
     // @Entity
-    // @Table(name = "ratings")
+    // @Table(name = "ratings", uniqueConstraints = @UniqueConstraint(columnNames = "booking_id"))
     structure Rating<entity, aggregate> {
         // @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
         immutable long ratingId<identifier>,
@@ -44,9 +45,7 @@ context ratingCore {
         immutable RatingTarget target<part>
     }
 
-    collection Ratings {
-        Rating r
-    }
+    collection Ratings { Rating r }
 
     // ── DTOs ───────────────────────────────────────────────────────────────────
 
@@ -74,9 +73,7 @@ context ratingCore {
         immutable string createdAt
     }
 
-    collection RatingResponses {
-        RatingResponse r
-    }
+    collection RatingResponses { RatingResponse r }
 
     // ── Repository ─────────────────────────────────────────────────────────────
 
@@ -84,9 +81,9 @@ context ratingCore {
     structure RatingRepository<repository> {
         function Rating findById(long ratingId),
         function Ratings findAll,
-        function Ratings findByVehicleId(long vehicleId),
-        function Ratings findByProviderId(long providerId),
-        function Rating findByBookingId(long bookingId),
+        function Ratings findByTarget_VehicleId(long vehicleId),
+        function Ratings findByTarget_ProviderId(long providerId),
+        function Rating findByTarget_BookingId(long bookingId),
         function boolean existsByBookingId(long bookingId),
         function Rating save(Rating rating)
     }
@@ -95,15 +92,8 @@ context ratingCore {
 
     // @Service
     structure RatingSubmissionService<applicationService> {
-        function Rating submitRating(
-            long bookingId,
-            long userId,
-            long vehicleId,
-            long providerId,
-            int vehicleScore,
-            int providerScore,
-            string comment
-        )
+        function Rating submitRating(long bookingId, long userId, long vehicleId,
+            long providerId, int vehicleScore, int providerScore, string comment)
     }
 
     // @Service
@@ -113,6 +103,7 @@ context ratingCore {
         function Rating getByBookingId(long bookingId),
         function Ratings getVehicleRatings(long vehicleId),
         function Ratings getProviderRatings(long providerId),
-        function double getAverageVehicleScore(long vehicleId)
+        function double getAverageVehicleScore(long vehicleId),
+        function double getAverageProviderScore(long providerId)
     }
 }

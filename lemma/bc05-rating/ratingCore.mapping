@@ -171,4 +171,15 @@ ratingCoreServices::com.winx.rating.RatingCore {
             }
         }
     }
+
+    operation ratingQuery.getAverageProviderScore {
+        endpoints { java::_protocols.rest: "/api/ratings/provider/{providerId}/average"; }
+        aspects { java::_aspects.GetMapping; }
+
+        parameters {
+            primitive providerId {
+                aspects { java::_aspects.PathVariable; }
+            }
+        }
+    }
 }

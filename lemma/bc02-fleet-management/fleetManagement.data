@@ -3,9 +3,10 @@ context fleetManagement {
     // ── Enumerations ───────────────────────────────────────────────────────────
 
     enum VehicleType {
-        BIKE,
-        SCOOTER,
-        CAR
+        E_SCOOTER,
+        BICYCLE,
+        E_BIKE,
+        E_CAR
     }
 
     enum VehicleStatus {
@@ -17,44 +18,39 @@ context fleetManagement {
 
     enum BillingModel {
         PER_HOUR,
-        PER_KM
-    }
-
-    // ── Value Objects ──────────────────────────────────────────────────────────
-
-    // @Embeddable
-    structure VehicleSpecs<valueObject> {
-        immutable int maxDurationMinutes,
-        immutable int maxKilometers,
-        immutable int minAge,
-        immutable int maxPersons
+        PER_KILOMETER,
+        PER_DAY
     }
 
     // ── Aggregate Root ─────────────────────────────────────────────────────────
 
     // @Entity
     // @Table(name = "vehicles")
-    structure Vehicle<entity, aggregate> {
+    structure Vehicle<entity> {
         // @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
         immutable long vehicleId<identifier>,
         // @Column(nullable = false)
         long providerId,
         // @Column(nullable = false)
         string name,
+        // @Enumerated(EnumType.STRING)
         VehicleType type,
         string description,
+        // @Enumerated(EnumType.STRING)
         VehicleStatus status,
         double currentLatitude,
         double currentLongitude,
         // @Column(precision = 10, scale = 2)
         double pricePerUnit,
+        // @Enumerated(EnumType.STRING)
         BillingModel billingModel,
-        VehicleSpecs specs<part>
+        int maxDurationMinutes,
+        int maxKilometers,
+        int minAge,
+        int maxPersons
     }
 
-    collection Vehicles {
-        Vehicle v
-    }
+    collection Vehicles { Vehicle v }
 
     // ── DTOs ───────────────────────────────────────────────────────────────────
 
@@ -101,15 +97,11 @@ context fleetManagement {
         immutable double currentLongitude,
         immutable double pricePerUnit,
         immutable BillingModel billingModel,
-        immutable int maxDurationMinutes,
-        immutable int maxKilometers,
         immutable int minAge,
         immutable int maxPersons
     }
 
-    collection VehicleResponses {
-        VehicleResponse r
-    }
+    collection VehicleResponses { VehicleResponse r }
 
     // ── Repository ─────────────────────────────────────────────────────────────
 
@@ -117,6 +109,7 @@ context fleetManagement {
     structure VehicleRepository<repository> {
         function Vehicles findAll,
         function Vehicle findById(long id),
+        function Vehicles findByProviderId(long providerId),
         function Vehicles findAvailableNear(double lat, double lon, double radiusKm),
         function Vehicle save(Vehicle vehicle),
         function boolean existsById(long id)
@@ -126,8 +119,7 @@ context fleetManagement {
 
     // @Service
     structure VehicleRegistrationService<applicationService> {
-        function Vehicle registerVehicle(CreateVehicleRequest request),
-        function Vehicle updateVehicle(long id, UpdateVehicleRequest request),
+        function Vehicle createVehicle(CreateVehicleRequest request),
         function boolean deleteVehicle(long id)
     }
 
@@ -135,7 +127,8 @@ context fleetManagement {
     structure VehicleAvailabilityService<applicationService> {
         function Vehicles getAllVehicles,
         function Vehicle findById(long id),
-        function Vehicles findAvailableNear(double lat, double lon, double radiusKm)
+        function Vehicles findAvailableNear(double lat, double lon, double radiusKm),
+        function Vehicles searchVehicles(string type, int minPersons)
     }
 
     // @Service

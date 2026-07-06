@@ -19,6 +19,10 @@ IdentityAccessServices::com.thewinx.identityaccess.IdentityAccess {
         endpoints { java::_protocols.rest: "/api/v1/identity"; }
     }
 
+    interface authValidation {
+        endpoints { java::_protocols.rest: "/api/auth"; }
+    }
+
     interface fleetGateway {
         endpoints { java::_protocols.rest: "/api/v1/identity/fleet"; }
     }
@@ -99,6 +103,15 @@ IdentityAccessServices::com.thewinx.identityaccess.IdentityAccess {
         parameters {
             primitive userId { aspects { java::_aspects.RequestParam(value="userId"); } }
             primitive permission { aspects { java::_aspects.RequestParam(value="permission"); } }
+        }
+    }
+
+    operation authValidation.validate {
+        endpoints { java::_protocols.rest: "/validate"; }
+        aspects { java::_aspects.GetMapping; }
+        parameters {
+            primitive username { aspects { java::_aspects.RequestParam(value="username"); } }
+            complex response { aspects { java::_aspects.ResponseEntity; } }
         }
     }
 

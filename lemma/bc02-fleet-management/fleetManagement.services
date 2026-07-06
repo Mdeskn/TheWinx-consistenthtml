@@ -56,16 +56,22 @@ public functional microservice com.winx.fleet.FleetManagement {
         );
 
         ---
-        Find available vehicles near a given geographic position.
+        Find available vehicles near a given geographic position, with optional type and capacity filters.
 
         @required lat the latitude of the search center point
         @required lon the longitude of the search center point
         @required radiusKm the search radius in kilometers
+        @param vehicleType optional vehicle type filter (E_SCOOTER, BICYCLE, E_BIKE, E_CAR)
+        @param maxPrice optional maximum price per unit in EUR
+        @param minPersons optional minimum passenger capacity required
         ---
         findAvailableNear(
             sync lat : double,
             sync lon : double,
             sync radiusKm : double,
+            sync vehicleType? : string,
+            sync maxPrice? : double,
+            sync minPersons? : int,
             sync out vehicles : domain::fleetManagement.VehicleResponses
         );
     }

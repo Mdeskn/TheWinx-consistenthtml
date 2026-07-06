@@ -6,7 +6,7 @@ public functional microservice com.thewinx.identityaccess.IdentityAccess {
         ---
         Register a new user account.
 
-        @requires request the username, email, and password for the new account
+        @required request the registration data: username, email, password, and personal details
         ---
         register(
             sync request : Domain::IdentityAccess.RegisterUserRequest,
@@ -23,7 +23,7 @@ public functional microservice com.thewinx.identityaccess.IdentityAccess {
         ---
         Get a specific user account by id.
 
-        @requires userId the unique id of the user
+        @required userId the unique id of the user
         ---
         getUser(
             sync userId : long,
@@ -33,8 +33,8 @@ public functional microservice com.thewinx.identityaccess.IdentityAccess {
         ---
         Update a user's username and email.
 
-        @requires userId the unique id of the user
-        @requires request the updated username and email
+        @required userId the unique id of the user
+        @required request the updated username and email
         ---
         updateUser(
             sync userId : long,
@@ -45,7 +45,7 @@ public functional microservice com.thewinx.identityaccess.IdentityAccess {
         ---
         Deactivate a user account.
 
-        @requires userId the unique id of the user
+        @required userId the unique id of the user
         ---
         deactivateUser(
             sync userId : long,
@@ -55,8 +55,8 @@ public functional microservice com.thewinx.identityaccess.IdentityAccess {
         ---
         Assign a role to a user.
 
-        @requires userId the unique id of the user
-        @requires request the name of the role to assign
+        @required userId the unique id of the user
+        @required request the name of the role to assign
         ---
         assignRole(
             sync userId : long,
@@ -67,8 +67,8 @@ public functional microservice com.thewinx.identityaccess.IdentityAccess {
         ---
         Revoke a role from a user.
 
-        @requires userId the unique id of the user
-        @requires request the name of the role to revoke
+        @required userId the unique id of the user
+        @required request the name of the role to revoke
         ---
         revokeRole(
             sync userId : long,
@@ -79,7 +79,7 @@ public functional microservice com.thewinx.identityaccess.IdentityAccess {
         ---
         Authenticate a user with username and password.
 
-        @requires request the username and password to authenticate
+        @required request the username and password to authenticate
         ---
         authenticate(
             sync request : Domain::IdentityAccess.AuthRequest,
@@ -89,13 +89,25 @@ public functional microservice com.thewinx.identityaccess.IdentityAccess {
         ---
         Check whether a user holds a specific permission.
 
-        @requires userId the unique id of the user
-        @requires permission the permission to check
+        @required userId the unique id of the user
+        @required permission the permission to check
         ---
         checkPermission(
             sync userId : long,
             sync permission : string,
             sync out response : Domain::IdentityAccess.PermissionCheckResponse
+        );
+    }
+
+    interface authValidation {
+        ---
+        Validate a username and return the principal. Called by BC-03 Booking via Feign.
+
+        @required username the username whose identity to confirm
+        ---
+        validate(
+            sync username : string,
+            sync out response : Domain::IdentityAccess.PrincipalDto
         );
     }
 
@@ -120,7 +132,7 @@ public functional microservice com.thewinx.identityaccess.IdentityAccess {
         ---
         Create a new vehicle booking.
 
-        @requires request the vehicle, username, and date range to book
+        @required request the vehicle, username, and booking details
         ---
         createBooking(
             sync request : Domain::IdentityAccess.VehicleBookingRequest,
@@ -130,7 +142,7 @@ public functional microservice com.thewinx.identityaccess.IdentityAccess {
         ---
         Cancel an existing booking.
 
-        @requires bookingId the unique id of the booking to cancel
+        @required bookingId the unique id of the booking to cancel
         ---
         cancelBooking(
             sync bookingId : long,
@@ -142,7 +154,7 @@ public functional microservice com.thewinx.identityaccess.IdentityAccess {
         ---
         Mock check of booking-side identity verification for BC-03 Booking.
 
-        @requires username the username to verify
+        @required username the username to verify
         ---
         bookingIdentityCheck(
             sync username : string,
@@ -152,7 +164,7 @@ public functional microservice com.thewinx.identityaccess.IdentityAccess {
         ---
         Mock check of payment eligibility for BC-04 Payment.
 
-        @requires userId the unique id of the user
+        @required userId the unique id of the user
         ---
         paymentEligibility(
             sync userId : long,
@@ -162,7 +174,7 @@ public functional microservice com.thewinx.identityaccess.IdentityAccess {
         ---
         Mock check of provider portal access for BC-02 Fleet.
 
-        @requires userId the unique id of the user
+        @required userId the unique id of the user
         ---
         providerAccess(
             sync userId : long,

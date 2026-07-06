@@ -1,35 +1,43 @@
 context paymentCore {
+
+    enum PaymentMethod {
+        CARD,
+        CASH,
+        PAYPAL,
+        BANK_TRANSFER
+    }
+
+    enum PaymentStatus {
+        PENDING,
+        PAID,
+        FAILED,
+        REFUNDED
+    }
+
+    // @Entity
+    // @Table(name = "payments")
     structure Payment<entity, aggregate> {
-        // Id
-        // GeneratedValue
+        // @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
         immutable long paymentId<identifier>,
-
-        // Reference only to the Booking bounded context
+        // Reference to booking in BC-03 (no FK — cross-BC reference by ID)
         immutable long bookingId,
-
         immutable long userId,
-
         immutable double amount,
-
         immutable string currency,
-
+        // @Enumerated(EnumType.STRING)
         PaymentMethod paymentMethod<part>,
-
+        // @Enumerated(EnumType.STRING)
         PaymentStatus status,
-
         string paidAt,
-
         string failureReason,
-
         immutable string createdAt,
 
         procedure markAsPaid(string paidAt),
-        procedure markAsFailed(string reason)
+        procedure markAsFailed(string reason),
+        procedure markAsRefunded()
     }
 
-    collection Payments {
-        Payment p
-    }
+    collection Payments { Payment p }
 
     structure PaymentRequest<valueObject> {
         immutable long bookingId,
@@ -39,35 +47,23 @@ context paymentCore {
         immutable PaymentMethod paymentMethod
     }
 
-    enum PaymentMethod {
-        CARD,
-        PAYPAL,
-        BANK_TRANSFER
-    }
-
-    enum PaymentStatus {
-        PENDING,
-        PAID,
-        FAILED
-    }
-
+    // @Repository
     structure PaymentRepository<repository> {
         function Payment findById(long paymentId),
         function Payment findByBookingId(long bookingId),
+        function Payments findByUserId(long userId),
+        function Payments findAll,
         function Payment save(Payment payment)
     }
 
+    // @Service
     structure PaymentService<applicationService> {
-        function Payment createAndProcessPayment(
-            long bookingId,
-            long userId,
-            double amount,
-            string currency,
-            PaymentMethod paymentMethod
-        ),
-
+        function Payment createAndProcessPayment(long bookingId, long userId,
+            double amount, string currency, PaymentMethod paymentMethod),
         function Payments getAllPayments,
         function Payment getPaymentById(long paymentId),
-        function Payment getPaymentByBookingId(long bookingId)
+        function Payment getPaymentByBookingId(long bookingId),
+        function Payments getPaymentsByUserId(long userId),
+        function Payment cancelPayment(long bookingId)
     }
 }

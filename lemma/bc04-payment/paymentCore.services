@@ -40,5 +40,26 @@ public functional microservice com.winx.payment.PaymentCore {
             sync out responseDto : domain::paymentCore.Payment,
             sync out fault paymentNotFound : string
         );
+
+        ---
+        Get all payments for a specific user.
+
+        @required userId the unique identifier of the user
+        ---
+        getPaymentsByUser(
+            sync userId : long,
+            sync out responseDto : domain::paymentCore.Payments
+        );
+
+        ---
+        Cancel a payment associated with a booking and mark it as REFUNDED.
+
+        @required bookingId the booking id whose payment should be refunded
+        ---
+        cancelPayment(
+            sync bookingId : long,
+            sync out responseDto : domain::paymentCore.Payment,
+            sync out fault paymentNotFound : string
+        );
     }
 }
