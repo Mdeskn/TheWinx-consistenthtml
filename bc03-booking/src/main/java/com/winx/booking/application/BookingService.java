@@ -17,6 +17,7 @@ import com.winx.booking.exception.BookingNotFoundException;
 import com.winx.booking.exception.VehicleNotAvailableException;
 import com.winx.booking.infrastructure.client.FleetGateway;
 import com.winx.booking.infrastructure.client.IdentityGateway;
+import com.winx.booking.infrastructure.client.PaymentGateway;
 import com.winx.booking.infrastructure.persistence.BookingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -34,6 +35,7 @@ public class BookingService {
     private final BookingRepository repository;
     private final IdentityGateway identityGateway;
     private final FleetGateway fleetGateway;
+    private final PaymentGateway paymentGateway;
     private final CostCalculationService costCalculationService;
     private final RestrictionValidator restrictionValidator;
     private final ApplicationEventPublisher eventPublisher;
