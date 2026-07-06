@@ -35,6 +35,31 @@ public class DataSeeder implements CommandLineRunner {
         Role providerRole = roleRepository.findByName("PROVIDER")
             .orElseGet(() -> roleRepository.save(new Role("PROVIDER", Set.of("FLEET_MANAGE", "VEHICLE_ADD", "VEHICLE_EDIT", "VEHICLE_DELETE"))));
 
+        // Provider accounts first — IDs 1, 2, 3 match BC-02 data.sql provider_id values
+        if (userAccountRepository.findByUsername("provider.tier").isEmpty()) {
+            UserAccount p1 = new UserAccount("provider.tier", "tier@thewinx.com", sha256("tier123"),
+                    "Tier", "Mobility", "491701110001", LocalDate.of(1982, 4, 12));
+            p1.assignRole(userRole);
+            p1.assignRole(providerRole);
+            userAccountRepository.save(p1);
+        }
+
+        if (userAccountRepository.findByUsername("provider.sharenow").isEmpty()) {
+            UserAccount p2 = new UserAccount("provider.sharenow", "sharenow@thewinx.com", sha256("share123"),
+                    "ShareNow", "Fleet", "491702220002", LocalDate.of(1979, 11, 30));
+            p2.assignRole(userRole);
+            p2.assignRole(providerRole);
+            userAccountRepository.save(p2);
+        }
+
+        if (userAccountRepository.findByUsername("provider.bolt").isEmpty()) {
+            UserAccount p3 = new UserAccount("provider.bolt", "bolt@thewinx.com", sha256("bolt123"),
+                    "Bolt", "Electric", "491703330003", LocalDate.of(1988, 7, 5));
+            p3.assignRole(userRole);
+            p3.assignRole(providerRole);
+            userAccountRepository.save(p3);
+        }
+
         if (userAccountRepository.findByUsername("demo.user").isEmpty()) {
             UserAccount demoUser = new UserAccount("demo.user", "demo.user@thewinx.com", sha256("demo123"),
                     "Alex", "Demo", "491701234567", LocalDate.of(1995, 6, 15));
