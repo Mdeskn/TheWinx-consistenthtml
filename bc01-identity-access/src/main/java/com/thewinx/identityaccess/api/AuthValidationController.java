@@ -36,7 +36,7 @@ public class AuthValidationController {
                 user.getId(),
                 isAdmin ? "ADMIN" : "USER",
                 user.getEmail(),
-                LocalDate.of(1995, 5, 20)
+                user.getDateOfBirth()
         );
     }
 

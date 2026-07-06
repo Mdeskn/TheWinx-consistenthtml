@@ -13,6 +13,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -32,6 +33,17 @@ public class UserAccount {
 
     @Column(nullable = false)
     private String passwordHash;
+
+    @Column(length = 60)
+    private String firstName;
+
+    @Column(length = 60)
+    private String lastName;
+
+    @Column(length = 20)
+    private String phoneNumber;
+
+    private LocalDate dateOfBirth;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -54,6 +66,17 @@ public class UserAccount {
         this.passwordHash = passwordHash;
     }
 
+    public UserAccount(String username, String email, String passwordHash,
+                       String firstName, String lastName, String phoneNumber, LocalDate dateOfBirth) {
+        this.username = username;
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phoneNumber = phoneNumber;
+        this.dateOfBirth = dateOfBirth;
+    }
+
     public Long getId() {
         return id;
     }
@@ -68,6 +91,22 @@ public class UserAccount {
 
     public String getPasswordHash() {
         return passwordHash;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
     }
 
     public AccountStatus getStatus() {

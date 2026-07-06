@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDate;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Objects;
@@ -29,6 +30,11 @@ public class IdentityAccessService {
     }
 
     public UserAccount register(String username, String email, String plainPassword) {
+        return register(username, email, plainPassword, null, null, null, null);
+    }
+
+    public UserAccount register(String username, String email, String plainPassword,
+                                String firstName, String lastName, String phoneNumber, LocalDate dateOfBirth) {
         userAccountRepository.findByUsername(username)
             .ifPresent(existing -> {
                 throw new DuplicateResourceException("Username already exists");
@@ -39,7 +45,8 @@ public class IdentityAccessService {
                 throw new DuplicateResourceException("Email already exists");
             });
 
-        UserAccount userAccount = new UserAccount(username, email, hashPassword(plainPassword));
+        UserAccount userAccount = new UserAccount(username, email, hashPassword(plainPassword),
+                firstName, lastName, phoneNumber, dateOfBirth);
         Role defaultRole = roleRepository.findByName("USER")
             .orElseThrow(() -> new NotFoundException("Default role USER is missing"));
         userAccount.assignRole(defaultRole);

@@ -65,6 +65,7 @@ public class IdentityUiController {
                              @RequestParam String email,
                              @RequestParam String username,
                              @RequestParam String phoneNumber,
+                             @RequestParam(required = false) String dateOfBirth,
                              @RequestParam String password,
                              @RequestParam String confirmPassword,
                              Model model,
@@ -74,7 +75,12 @@ public class IdentityUiController {
             return "register";
         }
 
-        identityAccessService.register(username, email, password);
+        java.time.LocalDate dob = null;
+        if (dateOfBirth != null && !dateOfBirth.isBlank()) {
+            try { dob = java.time.LocalDate.parse(dateOfBirth); } catch (Exception ignored) {}
+        }
+
+        identityAccessService.register(username, email, password, firstName, lastName, phoneNumber, dob);
         if (!redirectTo.startsWith("/")) {
             redirectTo = "/";
         }
