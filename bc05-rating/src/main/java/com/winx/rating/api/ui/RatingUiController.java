@@ -3,6 +3,8 @@ package com.winx.rating.api.ui;
 import com.winx.rating.api.dto.RatingResponse;
 import com.winx.rating.application.RatingQueryService;
 import com.winx.rating.application.RatingSubmissionService;
+import com.winx.rating.infrastructure.client.FleetFeignClient;
+import com.winx.rating.infrastructure.client.dto.VehicleResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -20,6 +22,7 @@ public class RatingUiController {
 
     private final RatingSubmissionService submissionService;
     private final RatingQueryService queryService;
+    private final FleetFeignClient fleetFeignClient;
 
     @GetMapping
     public String list(Model model) {
@@ -81,9 +84,17 @@ public class RatingUiController {
         model.addAttribute("ratings",
                 queryService.getVehicleRatings(vehicleId).stream()
                         .map(RatingResponse::from).toList());
-        model.addAttribute("filter", "Vehicle #" + vehicleId);
         model.addAttribute("averageScore", queryService.getAverageVehicleScore(vehicleId));
-        return "ratings/list";
+
+        VehicleResponse vehicle;
+        try {
+            vehicle = fleetFeignClient.getVehicle(vehicleId);
+        } catch (Exception e) {
+            vehicle = new VehicleResponse(vehicleId, null, "Vehicle #" + vehicleId, "UNKNOWN",
+                    "Fleet Management is currently unavailable.", "UNKNOWN", null, null, null, null);
+        }
+        model.addAttribute("vehicle", vehicle);
+        return "ratings/vehicle";
     }
 
     @GetMapping("/provider/{providerId}")
@@ -92,6 +103,7 @@ public class RatingUiController {
                 queryService.getProviderRatings(providerId).stream()
                         .map(RatingResponse::from).toList());
         model.addAttribute("filter", "Provider #" + providerId);
+        model.addAttribute("averageScore", queryService.getAverageProviderScore(providerId));
         return "ratings/list";
     }
 }

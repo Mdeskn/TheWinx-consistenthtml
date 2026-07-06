@@ -1,10 +1,16 @@
 package com.winx.rating.infrastructure.client.dto;
 
-/** Minimal projection of a Vehicle returned by bc02-fleet-management. */
+import java.math.BigDecimal;
+
 public record VehicleResponse(
         Long vehicleId,
         Long providerId,
-        String type,          // E_SCOOTER | BICYCLE | E_BIKE | E_CAR
+        String name,
+        String type,
         String description,
-        String status         // AVAILABLE | BOOKED
+        String status,
+        BigDecimal pricePerUnit,
+        String billingModel,
+        Integer minAge,
+        Integer maxPersons
 ) {}

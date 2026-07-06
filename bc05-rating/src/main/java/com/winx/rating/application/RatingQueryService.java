@@ -44,4 +44,11 @@ public class RatingQueryService {
                 .average()
                 .orElse(0.0);
     }
+
+    public double getAverageProviderScore(Long providerId) {
+        return ratingRepository.findByTarget_ProviderId(providerId).stream()
+                .mapToInt(r -> r.getReview().getProviderScore().getValue())
+                .average()
+                .orElse(0.0);
+    }
 }

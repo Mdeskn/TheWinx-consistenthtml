@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Vehicle #' + ${vehicle.vehicleId} + ' – Ratings'">Vehicle – Ratings</title>
+    <link rel="stylesheet" href="http://localhost:8080/styles.css">
+    <style>
+        .vehicle-card { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; }
+        .vehicle-stat { background: var(--surface-alt, #f8fafc); border: 1px solid var(--border, #e2e8f0);
+            border-radius: 10px; padding: .85rem 1rem; }
+        .vehicle-stat .stat-label { font-size: .73rem; text-transform: uppercase; letter-spacing: .06em;
+            opacity: .6; margin-bottom: .3rem; }
+        .vehicle-stat .stat-value { font-size: 1.1rem; font-weight: 700; }
+        .star-bar { display: flex; gap: 3px; margin-bottom: .2rem; }
+        .star { font-size: 1.2rem; }
+        .avg-score-big { font-size: 2.4rem; font-weight: 800; line-height: 1; }
+        .score-label { font-size: .85rem; opacity: .65; }
+        .type-badge { display: inline-block; font-size: .75rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .05em; border-radius: 6px; padding: 2px 8px;
+            background: #e0f2fe; color: #0369a1; }
+    </style>
+</head>
+<body>
+<main class="container">
+
+    <nav class="site-nav">
+        <a class="site-nav-brand" href="http://localhost:8081/">TheWinx</a>
+        <a href="http://localhost:8081/">Identity</a>
+        <a href="http://localhost:8082/list.html">Fleet</a>
+        <a href="http://localhost:8083/ui/search">Booking</a>
+        <a href="http://localhost:8084/payments">Payments</a>
+        <a class="current" href="http://localhost:8085/ratings">Ratings</a>
+    </nav>
+
+    <header class="panel hero">
+        <hgroup>
+            <p class="eyebrow">BC-05 · Rating · Vehicle</p>
+            <h1 th:text="${vehicle.name != null ? vehicle.name : 'Vehicle #' + vehicle.vehicleId}">Vehicle Name</h1>
+            <p class="subtitle">
+                <span class="type-badge" th:text="${vehicle.type}">E_SCOOTER</span>
+                &nbsp;
+                <span th:text="${vehicle.description}">Description</span>
+            </p>
+        </hgroup>
+        <nav class="link-group">
+            <a class="link-button secondary-button" href="/ratings">← All Ratings</a>
+            <a class="link-button secondary-button"
+               th:href="'http://localhost:8083/ui/search'">Book this type</a>
+        </nav>
+    </header>
+
+    <!-- Vehicle detail card -->
+    <section class="panel">
+        <h2>Vehicle Details</h2>
+        <div class="vehicle-card">
+            <div class="vehicle-stat">
+                <div class="stat-label">Status</div>
+                <div class="stat-value">
+                    <span class="status"
+                          th:classappend="${vehicle.status == 'AVAILABLE'} ? 'status-active' : 'status-inactive'"
+                          th:text="${vehicle.status}">AVAILABLE</span>
+                </div>
+            </div>
+            <div class="vehicle-stat">
+                <div class="stat-label">Price / Unit</div>
+                <div class="stat-value"
+                     th:text="${vehicle.pricePerUnit != null ? '€' + vehicle.pricePerUnit : '–'}">€0.20</div>
+            </div>
+            <div class="vehicle-stat">
+                <div class="stat-label">Billing Model</div>
+                <div class="stat-value"
+                     th:text="${vehicle.billingModel != null ? vehicle.billingModel.replace('_', ' ') : '–'}">PER KM</div>
+            </div>
+            <div class="vehicle-stat">
+                <div class="stat-label">Min. Age</div>
+                <div class="stat-value"
+                     th:text="${vehicle.minAge != null ? vehicle.minAge + '+' : '–'}">18+</div>
+            </div>
+            <div class="vehicle-stat">
+                <div class="stat-label">Max Persons</div>
+                <div class="stat-value"
+                     th:text="${vehicle.maxPersons != null ? vehicle.maxPersons : '–'}">1</div>
+            </div>
+            <div class="vehicle-stat">
+                <div class="stat-label">Provider</div>
+                <div class="stat-value">
+                    <a th:href="@{/ratings/provider/{id}(id=${vehicle.providerId})}"
+                       th:text="'Provider #' + ${vehicle.providerId}">#1</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Average score -->
+    <section class="panel">
+        <h2>Rating Summary</h2>
+        <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;">
+            <div>
+                <div class="avg-score-big"
+                     th:text="${#numbers.formatDecimal(averageScore, 1, 1)}">4.5</div>
+                <div class="score-label">avg vehicle score</div>
+            </div>
+            <div>
+                <div class="star-bar" th:with="rounded=${#numbers.formatDecimal(averageScore, 1, 0)}">
+                    <span class="star" th:each="i : ${#numbers.sequence(1, 5)}"
+                          th:text="${i <= averageScore} ? '★' : '☆'">★</span>
+                </div>
+                <div class="score-label"
+                     th:text="${#lists.size(ratings)} + ' rating' + (${#lists.size(ratings)} != 1 ? 's' : '')">
+                    3 ratings
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ratings list -->
+    <section class="panel" th:if="${not #lists.isEmpty(ratings)}">
+        <h2>All Ratings for this Vehicle</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>#</th><th>Booking</th><th>User</th>
+                    <th>Vehicle Score</th><th>Provider Score</th>
+                    <th>Comment</th><th>Date</th><th></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="r : ${ratings}">
+                    <td th:text="${r.ratingId}"></td>
+                    <td th:text="'#' + r.bookingId"></td>
+                    <td th:text="${r.userId}"></td>
+                    <td>
+                        <span class="status"
+                              th:classappend="${r.vehicleScore >= 4} ? 'score-high' : (${r.vehicleScore == 3} ? 'score-mid' : 'score-low')"
+                              th:text="${r.vehicleScore} + '/5'"></span>
+                    </td>
+                    <td>
+                        <span class="status"
+                              th:classappend="${r.providerScore >= 4} ? 'score-high' : (${r.providerScore == 3} ? 'score-mid' : 'score-low')"
+                              th:text="${r.providerScore} + '/5'"></span>
+                    </td>
+                    <td>
+                        <span th:if="${r.comment != null and !r.comment.isEmpty()}"
+                              th:text="${r.comment}" class="text-muted italic"></span>
+                        <span th:if="${r.comment == null or r.comment.isEmpty()}"
+                              class="text-muted">–</span>
+                    </td>
+                    <td th:text="${#temporals.format(r.createdAt, 'yyyy-MM-dd')}"></td>
+                    <td>
+                        <a th:href="@{/ratings/{id}(id=${r.ratingId})}"
+                           class="link-button secondary-button">View</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel empty-state" th:if="${#lists.isEmpty(ratings)}">
+        <p>No ratings yet for this vehicle.</p>
+        <a th:href="@{/ratings/submit(vehicleId=${vehicle.vehicleId})}"
+           class="link-button">Be the first to rate it</a>
+    </section>
+
+</main>
+</body>
+</html>

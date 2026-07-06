@@ -68,6 +68,12 @@ public class RatingController {
                 .map(RatingResponse::from).toList();
     }
 
+    @GetMapping("/provider/{providerId}/average")
+    @Operation(summary = "Average provider score")
+    public Map<String, Double> getAverageProviderScore(@PathVariable Long providerId) {
+        return Map.of("averageProviderScore", queryService.getAverageProviderScore(providerId));
+    }
+
     @GetMapping("/booking/{bookingId}")
     @Operation(summary = "Check whether a booking has been rated")
     public Map<String, Object> getByBooking(@PathVariable Long bookingId) {
