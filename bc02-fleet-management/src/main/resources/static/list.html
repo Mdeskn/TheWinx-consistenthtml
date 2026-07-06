@@ -165,7 +165,6 @@ function renderVehicles() {
         detailRow.id = "detail-" + v.vehicleId;
         const lat  = v.currentLatitude  != null ? v.currentLatitude.toFixed(4)  : "-";
         const lon  = v.currentLongitude != null ? v.currentLongitude.toFixed(4) : "-";
-        const bookUrl = `http://localhost:8083/ui/search`;
         detailRow.innerHTML = `
             <td colspan="8">
                 <div class="detail-panel">
@@ -174,7 +173,7 @@ function renderVehicles() {
                     <dl><dt>Max Persons</dt><dd>${v.maxPersons ?? "-"}</dd></dl>
                     <dl><dt>Location</dt><dd>${lat}, ${lon}</dd></dl>
                     <div class="book-btn">
-                        <a class="link-button" href="${bookUrl}">Book via BC-03 Search</a>
+                        <a class="link-button" href="http://localhost:8081/ui/dashboard">Book via User Dashboard (BC-01)</a>
                     </div>
                 </div>
             </td>`;
