@@ -1,4 +1,4 @@
-# BC-05 Rating
+# BC-05: Rating
 
 **Owner:** Mae | **Port:** 8085
 
@@ -6,23 +6,22 @@
 
 ## What this service does
 
-BC-05 Rating is the bounded context responsible for collecting user feedback after a completed ride. Once a booking reaches `COMPLETED` status, the user can submit a rating that evaluates both the vehicle and the provider independently, each scored from 1 to 5, with an optional comment.
+BC-05 lets users rate a completed ride. Each rating scores the vehicle and the provider independently on a 1-5 scale, with an optional comment. Clicking a vehicle ID anywhere in the rating UI opens a full vehicle detail page pulled live from BC-02, so reviewers can see exactly what they are rating.
 
-The service enforces two core rules:
-- A booking can only be rated **once**. Attempting to submit a second rating for the same booking returns a 409 error.
-- A rating can only be submitted for a **completed** booking. The service calls BC-03 Booking via a Feign client to verify this. If BC-03 is unreachable, a Resilience4j circuit breaker opens and the fallback allows the rating through so users are never blocked by a downstream outage.
-
-There is also a Feign client for BC-02 Fleet Management, used to enrich vehicle display information.
+Three business rules enforced:
+- A booking can only be rated once. A duplicate attempt returns 409 Conflict.
+- Only bookings in `COMPLETED` status are eligible. BC-03 is called to verify this. If BC-03 is unreachable, the circuit breaker fallback returns COMPLETED so users are never blocked by a downstream outage.
+- Vehicle and provider scores must each be between 1 and 5. Out-of-range values return 400 Bad Request.
 
 ---
 
 ## How it fits in the system
 
 ```
-BC-03 Booking  ──(verify COMPLETED)──▶  BC-05 Rating  ◀──(vehicle info)──  BC-02 Fleet
+BC-03 Booking  -(verify COMPLETED)->  BC-05 Rating  <-(vehicle detail)-  BC-02 Fleet
 ```
 
-BC-05 is a **leaf context** — it consumes from others but no other service depends on it.
+BC-05 is a leaf context - it consumes from others but nothing in the platform depends on it downstream.
 
 ---
 
@@ -30,124 +29,131 @@ BC-05 is a **leaf context** — it consumes from others but no other service dep
 
 ```
 bc05-rating/
-├── src/main/java/com/winx/rating/
-│   ├── RatingApplication.java              Entry point (@EnableFeignClients)
-│   │
-│   ├── domain/                             Core business logic
-│   │   ├── Score.java                      Value object — integer 1–5, rejects invalid values
-│   │   ├── Review.java                     Value object — holds vehicleScore + providerScore + comment
-│   │   ├── RatingTarget.java               Value object — links a rating to vehicleId, providerId, bookingId
-│   │   └── Rating.java                     Aggregate root and JPA entity
-│   │
-│   ├── infrastructure/
-│   │   ├── RatingRepository.java           Spring Data JPA — queries by vehicle, provider, booking
-│   │   └── client/                         Inter-service communication
-│   │       ├── BookingFeignClient.java      Calls GET /bookings/{id} on BC-03
-│   │       ├── BookingFeignFallback.java    Returns COMPLETED when BC-03 is unreachable
-│   │       ├── FleetFeignClient.java        Calls GET /vehicles/{id} on BC-02
-│   │       ├── FleetFeignFallback.java      Returns placeholder when BC-02 is unreachable
-│   │       └── dto/
-│   │           ├── BookingStatusResponse.java
-│   │           └── VehicleResponse.java
-│   │
-│   ├── application/
-│   │   ├── RatingSubmissionService.java     Handles submit logic — checks duplicate + COMPLETED status
-│   │   └── RatingQueryService.java          Reads ratings, computes average scores
-│   │
-│   ├── api/
-│   │   ├── RatingController.java           REST API (7 endpoints)
-│   │   ├── GlobalExceptionHandler.java     Maps exceptions to HTTP status codes
-│   │   ├── dto/
-│   │   │   ├── SubmitRatingRequest.java     Input record for POST /api/ratings
-│   │   │   └── RatingResponse.java          Output record for all responses
-│   │   └── ui/
-│   │       ├── RatingForm.java              Mutable form bean for Thymeleaf binding
-│   │       └── RatingUiController.java      Serves HTML pages
-│   │
-│   └── config/
-│       └── OpenApiConfig.java              Swagger UI setup
-│
-└── src/main/resources/
-    ├── application.yml                      Port, H2, Eureka, Config Server, Feign, Resilience4j
-    ├── data.sql                             5 sample ratings seeded on startup
-    ├── static/styles.css                   Shared design system (consistent with BC-01)
-    └── templates/ratings/
-        ├── list.html                        All ratings, filterable by vehicle or provider
-        ├── submit.html                      Form to submit a new rating
-        └── detail.html                      Single rating detail view
+└── src/main/java/com/winx/rating/
+    │
+    ├── RatingApplication.java              Entry point (@EnableFeignClients)
+    │
+    ├── domain/
+    │   ├── Score.java                      Value object - integer 1-5, rejects out-of-range at construction
+    │   ├── Review.java                     Value object - vehicleScore + providerScore + comment (optional)
+    │   ├── RatingTarget.java               Value object - vehicleId, providerId, bookingId (unique per booking)
+    │   └── Rating.java                     Aggregate root + JPA entity (immutable once persisted)
+    │
+    ├── infrastructure/
+    │   ├── RatingRepository.java           Spring Data JPA
+    │   │                                   findByTarget_VehicleId, findByTarget_ProviderId,
+    │   │                                   findByTarget_BookingId, existsByBookingId
+    │   └── client/
+    │       ├── BookingFeignClient.java      Feign -> BC-03 GET /api/v1/bookings/{id}
+    │       ├── BookingFeignFallback.java    Returns status=COMPLETED when BC-03 is down
+    │       ├── FleetFeignClient.java        Feign -> BC-02 GET /api/v1/vehicles/{id}
+    │       ├── FleetFeignFallback.java      Returns placeholder vehicle when BC-02 is down
+    │       └── dto/
+    │           ├── BookingStatusResponse.java   bookingId + status string
+    │           └── VehicleResponse.java         All 10 vehicle fields from BC-02
+    │
+    ├── application/
+    │   ├── RatingSubmissionService.java    Validates duplicate + booking status, then persists
+    │   └── RatingQueryService.java         Reads ratings + computes getAverageVehicleScore,
+    │                                       getAverageProviderScore
+    │
+    ├── api/
+    │   ├── RatingController.java           REST API (8 endpoints, see table below)
+    │   ├── GlobalExceptionHandler.java     Maps domain exceptions to HTTP 400/404/409
+    │   ├── dto/
+    │   │   ├── SubmitRatingRequest.java     Input: bookingId, userId, vehicleId, providerId,
+    │   │   │                               vehicleScore, providerScore, comment
+    │   │   └── RatingResponse.java          Output: all rating fields + createdAt
+    │   └── ui/
+    │       ├── RatingForm.java              Mutable form bean for Thymeleaf POST binding
+    │       └── RatingUiController.java      Serves all HTML pages; injects FleetFeignClient
+    │                                        to enrich vehicle detail page
+    │
+    └── config/
+        └── OpenApiConfig.java              Swagger UI title + description
 ```
+
+```
+src/main/resources/
+├── application.yml        Port 8085, H2 (jdbc:h2:mem:rating), Eureka, Config Server,
+│                          Feign timeouts, Resilience4j circuit breakers
+├── data.sql               8 seeded ratings referencing real BC-02 vehicle IDs (1-8),
+│                          real BC-01 provider IDs (1-3), booking IDs 9001-9008
+│                          (high range to avoid conflicts with live demo bookings)
+└── templates/ratings/
+    ├── list.html           All ratings table - colour-coded scores, vehicle ID links
+    ├── submit.html         Form to submit a new rating (pre-fills vehicleId/providerId
+    │                       from query params if coming from a booking)
+    ├── detail.html         Single rating detail view
+    └── vehicle.html        Vehicle detail page: fetches live data from BC-02,
+                            shows vehicle specs + average score + all ratings for that vehicle
+```
+
+---
+
+## Seeded ratings (data.sql)
+
+| Booking ID | Vehicle ID | Provider | Vehicle score | Provider score | Vehicle |
+|------------|------------|----------|---------------|----------------|---------|
+| 9001 | 1 | 1 | 5 | 4 | Tier e-scooter |
+| 9002 | 2 | 1 | 4 | 5 | Tier bicycle |
+| 9003 | 4 | 2 | 5 | 5 | ShareNow e-car |
+| 9004 | 5 | 2 | 3 | 4 | Voi e-scooter |
+| 9005 | 7 | 3 | 5 | 5 | Bolt e-bike |
+| 9006 | 8 | 3 | 4 | 3 | Sixt e-car |
+| 9007 | 3 | 1 | 2 | 4 | Lime e-bike |
+| 9008 | 6 | 2 | 5 | 5 | Swapfiets bicycle |
+
+Vehicle IDs 1-8 match BC-02's seeded vehicles exactly.
 
 ---
 
 ## Prerequisites
 
-Requires **Java 21**. If `java -version` doesn't show 21, run:
+Java 21. Verify with `java -version`. If needed:
 
 ```bash
 export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
 export PATH="$JAVA_HOME/bin:$PATH"
 ```
 
-To make it permanent, add those two lines to your `~/.zshrc`.
-
----
-
-## Build
-
-From the repo root (`TheWinx-SS2026/`):
-
-```bash
-./mvnw -pl bc05-rating -DskipTests clean package
-```
-
-Expected output: `BUILD SUCCESS`
-
 ---
 
 ## Run
 
-### Standalone (no other services needed)
-
 ```bash
-export JAVA_HOME=/opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home
+# Standalone - no other services needed
 ./mvnw -pl bc05-rating spring-boot:run
 ```
 
-Warnings about Eureka and Config Server in the log are normal when running standalone — the service works fine without them. The Feign fallbacks will activate automatically since BC-03 and BC-02 are not running.
-
-### Full system (Task 2)
-
-Start services in this order, each in its own terminal:
+Eureka and Config Server warnings in the log are expected in standalone mode. Feign fallbacks activate automatically for BC-02 and BC-03.
 
 ```bash
+# Full system - start in order
 ./mvnw -pl infra-eureka-server   spring-boot:run
 ./mvnw -pl infra-config-server   spring-boot:run
-./mvnw -pl bc01-identity-access  spring-boot:run
 ./mvnw -pl bc02-fleet-management spring-boot:run
 ./mvnw -pl bc03-booking          spring-boot:run
-./mvnw -pl bc04-payment          spring-boot:run
 ./mvnw -pl bc05-rating           spring-boot:run
 ```
 
 ---
 
-## UI Pages
+## UI pages
 
 | URL | Description |
 |-----|-------------|
-| `http://localhost:8085/ratings` | All ratings — table view with color-coded scores |
-| `http://localhost:8085/ratings/submit` | Form to submit a new rating |
-| `http://localhost:8085/ratings/{id}` | Detail view of a single rating |
-| `http://localhost:8085/ratings/vehicle/{vehicleId}` | All ratings for a vehicle + average score |
-| `http://localhost:8085/ratings/provider/{providerId}` | All ratings for a provider |
-
-The UI uses the same design system as BC-01 (Outfit/Space Grotesk fonts, shared color palette, panel layout).
+| `http://localhost:8085/ratings` | All ratings - table with colour-coded scores, click vehicle ID to see details |
+| `http://localhost:8085/ratings/submit` | Submit a new rating |
+| `http://localhost:8085/ratings/{id}` | Single rating detail |
+| `http://localhost:8085/ratings/vehicle/{vehicleId}` | Vehicle detail page: specs from BC-02 + average score + all ratings |
+| `http://localhost:8085/ratings/provider/{providerId}` | All ratings for a provider + average provider score |
 
 ---
 
 ## REST API
 
-Full interactive docs: `http://localhost:8085/swagger-ui.html`
+Full docs: `http://localhost:8085/swagger-ui/index.html`
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
@@ -158,53 +164,62 @@ Full interactive docs: `http://localhost:8085/swagger-ui.html`
 | `GET` | `/api/ratings/vehicle/{vehicleId}` | All ratings for a vehicle |
 | `GET` | `/api/ratings/vehicle/{vehicleId}/average` | Average vehicle score |
 | `GET` | `/api/ratings/provider/{providerId}` | All ratings for a provider |
+| `GET` | `/api/ratings/provider/{providerId}/average` | Average provider score |
 
 **Submit a rating:**
 ```bash
 curl -X POST http://localhost:8085/api/ratings \
   -H "Content-Type: application/json" \
   -d '{
-    "bookingId": 2001,
-    "userId": 5,
-    "vehicleId": 20,
-    "providerId": 200,
-    "vehicleScore": 4,
-    "providerScore": 5,
-    "comment": "Smooth ride, very clean vehicle!"
+    "bookingId": 42,
+    "userId": 4,
+    "vehicleId": 1,
+    "providerId": 1,
+    "vehicleScore": 5,
+    "providerScore": 4,
+    "comment": "Smooth ride, battery lasted the whole trip!"
   }'
+```
+
+**Average provider score:**
+```bash
+curl http://localhost:8085/api/ratings/provider/1/average
+# {"averageProviderScore": 4.33}
 ```
 
 **Business rule checks:**
 ```bash
-# Duplicate booking → 409 Conflict
+# Duplicate booking - 409 Conflict
 curl -X POST http://localhost:8085/api/ratings \
   -H "Content-Type: application/json" \
-  -d '{"bookingId":1001,"userId":1,"vehicleId":10,"providerId":100,"vehicleScore":4,"providerScore":4}'
+  -d '{"bookingId":9001,"userId":4,"vehicleId":1,"providerId":1,"vehicleScore":3,"providerScore":3}'
 
-# Score out of range → 400 Bad Request
+# Score out of range - 400 Bad Request
 curl -X POST http://localhost:8085/api/ratings \
   -H "Content-Type: application/json" \
-  -d '{"bookingId":9999,"userId":1,"vehicleId":10,"providerId":100,"vehicleScore":9,"providerScore":3}'
+  -d '{"bookingId":9999,"userId":4,"vehicleId":1,"providerId":1,"vehicleScore":9,"providerScore":3}'
 ```
 
 ---
 
 ## Other endpoints
 
-**Health check:**
-```
-GET http://localhost:8085/actuator/health
-```
+| URL | What |
+|-----|------|
+| `http://localhost:8085/swagger-ui/index.html` | Interactive API docs |
+| `http://localhost:8085/h2-console` | H2 browser - JDBC URL: `jdbc:h2:mem:rating`, user: `sa` |
+| `http://localhost:8085/actuator/health` | Health check |
+| `http://localhost:8085/actuator/circuitbreakers` | Circuit breaker state (requires full system) |
 
-**H2 database console:** `http://localhost:8085/h2-console`
-- JDBC URL: `jdbc:h2:mem:rating`
-- Username: `sa` | Password: *(leave empty)*
-- Run `SELECT * FROM RATINGS;` to inspect stored data
+---
 
-**Circuit breaker status:**
-```
-GET http://localhost:8085/actuator/circuitbreakers
-```
+## Assignment coverage
 
-**Eureka dashboard** (full system only): `http://localhost:8761`
-BC-05 should appear as `BC05-RATING` once registered.
+| Assignment | What BC-05 contributes |
+|---|---|
+| A02 - Requirements | R08 Rate Vehicle and Provider |
+| A03 - Context Map | Leaf downstream of BC-03 (Customer/Supplier -> Conformist) and BC-02 (OHS/PL -> ACL) |
+| A04 - Tactical Design | Aggregate: `Rating` (immutable); Value objects: `Score`, `Review`, `RatingTarget`; Domain event: `RatingSubmitted`; Business rules: no duplicate ratings, only COMPLETED bookings |
+| A05 Task 1 - Standalone | Runs independently with 8 seeded ratings; full Swagger docs; fallbacks for BC-02/BC-03 |
+| A05 Task 2 - Integration | Feign to BC-03 (verify COMPLETED) + BC-02 (vehicle detail page); Resilience4j circuit breakers |
+| A06 - LEMMA | `ratingCore.data`, `.services`, `.mapping`, `.operation` in `lemma/bc05-rating/` |
