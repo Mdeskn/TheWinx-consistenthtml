@@ -78,8 +78,6 @@ public class PaymentService {
     }
 
     public List<Payment> getPaymentsByUserId(Long userId) {
-        return paymentRepository.findAll().stream()
-                .filter(p -> userId.equals(p.getUserId()))
-                .toList();
+        return paymentRepository.findByUserId(userId);
     }
 }

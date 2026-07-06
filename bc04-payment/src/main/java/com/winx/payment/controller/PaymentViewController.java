@@ -19,8 +19,10 @@ public class PaymentViewController {
     }
 
     @GetMapping
-    public String showPayments(Model model) {
-        model.addAttribute("payments", paymentService.getAllPayments());
+    public String showPayments(@RequestParam(required = false) Long userId, Model model) {
+        model.addAttribute("payments",
+                userId != null ? paymentService.getPaymentsByUserId(userId) : paymentService.getAllPayments());
+        model.addAttribute("userId", userId);
         return "payments";
     }
 

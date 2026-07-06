@@ -30,6 +30,18 @@
     </header>
 
     <section class="panel">
+        <h2>Filter by User</h2>
+        <form method="get" action="/payments" class="form-grid">
+            <label>User ID (leave empty for all)
+                <input type="number" name="userId" th:value="${userId}" placeholder="e.g. 4">
+            </label>
+            <label>&nbsp;
+                <button type="submit">Show</button>
+            </label>
+        </form>
+    </section>
+
+    <section class="panel">
         <h2>Payment History</h2>
         <div class="table-wrap">
             <table>
@@ -47,12 +59,17 @@
                     <td th:text="${payment.amount}"></td>
                     <td th:text="${payment.currency}"></td>
                     <td th:text="${payment.paymentMethod}"></td>
-                    <td th:text="${payment.status}" th:class="${payment.status}"></td>
+                    <td>
+                        <span class="status"
+                              th:classappend="${payment.status.name() == 'PAID'} ? 'status-active' :
+                                             (${payment.status.name() == 'REFUNDED'} ? 'status-info' : 'status-inactive')"
+                              th:text="${payment.status}">PAID</span>
+                    </td>
                     <td th:text="${payment.paidAt}"></td>
                     <td th:text="${payment.failureReason}"></td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(payments)}">
-                    <td colspan="9" class="empty-state">No payments yet.</td>
+                    <td colspan="9" class="text-muted">No payments found.</td>
                 </tr>
                 </tbody>
             </table>
