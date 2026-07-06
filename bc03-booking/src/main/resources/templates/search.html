@@ -48,7 +48,19 @@
                 <input type="number" step="any" id="radiusKm" name="radiusKm" th:value="${radiusKm}">
             </label>
             <label>Vehicle Type
-                <input type="text" id="type" name="type" th:value="${type}" placeholder="E_SCOOTER">
+                <select id="type" name="type">
+                    <option value="" th:selected="${type == null or type == ''}">All Types</option>
+                    <option value="E_SCOOTER" th:selected="${type == 'E_SCOOTER'}">E-Scooter</option>
+                    <option value="BICYCLE" th:selected="${type == 'BICYCLE'}">Bicycle</option>
+                    <option value="E_BIKE" th:selected="${type == 'E_BIKE'}">E-Bike</option>
+                    <option value="E_CAR" th:selected="${type == 'E_CAR'}">E-Car</option>
+                </select>
+            </label>
+            <label>Max Price / Unit (EUR)
+                <input type="number" step="0.01" id="maxPrice" name="maxPrice" th:value="${maxPrice}" placeholder="any">
+            </label>
+            <label>Min. Persons needed
+                <input type="number" id="minPersons" name="minPersons" th:value="${minPersons}" placeholder="1" min="1">
             </label>
             <label>Username <small style="font-weight:400;opacity:.7">(required to book)</small>
                 <input type="text" id="token" name="token" th:value="${token}" placeholder="e.g. demo.user">
@@ -66,7 +78,7 @@
                 <thead>
                 <tr>
                     <th>ID</th><th>Type</th><th>Description</th><th>Status</th>
-                    <th>Price</th><th>Billing</th><th></th>
+                    <th>Price</th><th>Billing</th><th>Min Age</th><th>Max Persons</th><th></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -81,6 +93,8 @@
                     </td>
                     <td th:text="${v.pricePerUnit()}">0.20</td>
                     <td th:text="${v.billingModel()}">PER_HOUR</td>
+                    <td th:text="${v.minAge() != null ? v.minAge() + '+' : '-'}">18+</td>
+                    <td th:text="${v.maxPersons() != null ? v.maxPersons() : '-'}">1</td>
                     <td>
                         <form method="post" th:action="@{/ui/bookings/create}">
                             <input type="hidden" name="vehicleId"       th:value="${v.vehicleId()}">
@@ -92,7 +106,7 @@
                     </td>
                 </tr>
                 <tr th:if="${#lists.isEmpty(results)}">
-                    <td colspan="7" class="text-muted">No available vehicles (or Fleet Management is unavailable).</td>
+                    <td colspan="9" class="text-muted">No available vehicles (or Fleet Management is unavailable).</td>
                 </tr>
                 </tbody>
             </table>

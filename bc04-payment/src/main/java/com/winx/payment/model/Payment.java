@@ -63,6 +63,10 @@ public class Payment {
         this.failureReason = reason;
     }
 
+    public void markAsRefunded() {
+        this.status = PaymentStatus.REFUNDED;
+    }
+
     public Long getPaymentId() {
         return paymentId;
     }

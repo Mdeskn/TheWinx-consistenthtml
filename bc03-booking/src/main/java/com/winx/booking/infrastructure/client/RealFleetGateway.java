@@ -28,8 +28,8 @@ public class RealFleetGateway implements FleetGateway {
 
     @Override
     @CircuitBreaker(name = "fleet", fallbackMethod = "searchUnavailable")
-    public List<VehicleDto> search(double lat, double lon, double radiusKm, String type, BigDecimal maxPrice) {
-        return client.search(lat, lon, radiusKm, type, maxPrice);
+    public List<VehicleDto> search(double lat, double lon, double radiusKm, String type, BigDecimal maxPrice, Integer minPersons) {
+        return client.search(lat, lon, radiusKm, type, maxPrice, minPersons);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class RealFleetGateway implements FleetGateway {
 
     @SuppressWarnings("unused")
     private List<VehicleDto> searchUnavailable(double lat, double lon, double radiusKm,
-                                               String type, BigDecimal maxPrice, Throwable t) {
+                                               String type, BigDecimal maxPrice, Integer minPersons, Throwable t) {
         return List.of();
     }
 

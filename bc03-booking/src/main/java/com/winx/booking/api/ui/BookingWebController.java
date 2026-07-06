@@ -28,12 +28,14 @@ public class BookingWebController {
     public String search(@RequestParam(required = false) String location,
                          @RequestParam(required = false, defaultValue = "5.0") Double radiusKm,
                          @RequestParam(required = false) String type,
+                         @RequestParam(required = false) java.math.BigDecimal maxPrice,
+                         @RequestParam(required = false) Integer minPersons,
                          @RequestParam(required = false) String token,
                          Model model) {
         DemoLocations.Location loc = DemoLocations.find(location);
         String resolvedType = (type != null && !type.isBlank()) ? type : null;
         if (loc != null) {
-            model.addAttribute("results", service.searchVehicles(loc.latitude(), loc.longitude(), radiusKm, resolvedType, null));
+            model.addAttribute("results", service.searchVehicles(loc.latitude(), loc.longitude(), radiusKm, resolvedType, maxPrice, minPersons));
             model.addAttribute("lat", loc.latitude());
             model.addAttribute("lon", loc.longitude());
         }
@@ -41,6 +43,8 @@ public class BookingWebController {
         model.addAttribute("selectedLocation", location);
         model.addAttribute("radiusKm", radiusKm);
         model.addAttribute("type", type);
+        model.addAttribute("maxPrice", maxPrice);
+        model.addAttribute("minPersons", minPersons);
         model.addAttribute("token", token);
         return "search";
     }

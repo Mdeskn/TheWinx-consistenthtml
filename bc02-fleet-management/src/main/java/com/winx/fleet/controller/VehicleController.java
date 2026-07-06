@@ -52,17 +52,19 @@ public class VehicleController {
         vehicleRepository.deleteById(id);
     }
 
-    // Required by BC-03 FleetClient: GET /vehicles/search?lat=&lon=&radiusKm=&type=&maxPrice=
+    // Required by BC-03 FleetClient: GET /vehicles/search?lat=&lon=&radiusKm=&type=&maxPrice=&minPersons=
     @GetMapping("/search")
     public List<VehicleResponse> searchVehicles(
             @RequestParam double lat,
             @RequestParam double lon,
             @RequestParam double radiusKm,
             @RequestParam(required = false) String type,
-            @RequestParam(required = false) BigDecimal maxPrice) {
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) Integer minPersons) {
         return availabilityService.findAvailableNear(lat, lon, radiusKm).stream()
                 .filter(v -> type == null || v.getType().name().equalsIgnoreCase(type))
                 .filter(v -> maxPrice == null || v.getPricePerUnit().compareTo(maxPrice) <= 0)
+                .filter(v -> minPersons == null || (v.getMaxPersons() != null && v.getMaxPersons() >= minPersons))
                 .map(VehicleResponse::from)
                 .toList();
     }

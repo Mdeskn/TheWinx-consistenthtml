@@ -21,9 +21,21 @@ public class RealPaymentGateway implements PaymentGateway {
         client.authorize(request);
     }
 
+    @Override
+    @CircuitBreaker(name = "payment", fallbackMethod = "cancelDeferred")
+    public void cancelPayment(Long bookingId) {
+        client.cancelPayment(bookingId);
+    }
+
     @SuppressWarnings("unused")
     private void paymentDeferred(AuthorizeRequest request, Throwable t) {
         log.warn("Payment unavailable; deferring payment for booking {} ({} {}). Reason: {}",
                 request.bookingId(), request.amount(), request.currency(), t.toString());
+    }
+
+    @SuppressWarnings("unused")
+    private void cancelDeferred(Long bookingId, Throwable t) {
+        log.warn("Payment cancel unavailable for booking {}; no payment record may exist yet. Reason: {}",
+                bookingId, t.getMessage());
     }
 }

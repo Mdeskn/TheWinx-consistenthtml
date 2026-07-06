@@ -67,6 +67,11 @@ public class BookingService {
                 .orElseThrow(() -> new BookingNotFoundException(bookingId));
         booking.cancel();
         fleetGateway.markAvailable(booking.getVehicleSnapshot().getVehicleId());
+        try {
+            paymentGateway.cancelPayment(bookingId);
+        } catch (Exception ignored) {
+            // No payment may exist yet (booking cancelled before completion); ignore silently
+        }
         return booking;
     }
 
@@ -107,7 +112,7 @@ public class BookingService {
 
     @Transactional(readOnly = true)
     public List<VehicleDto> searchVehicles(double lat, double lon, double radiusKm,
-                                           String type, BigDecimal maxPrice) {
-        return fleetGateway.search(lat, lon, radiusKm, type, maxPrice);
+                                           String type, BigDecimal maxPrice, Integer minPersons) {
+        return fleetGateway.search(lat, lon, radiusKm, type, maxPrice, minPersons);
     }
 }

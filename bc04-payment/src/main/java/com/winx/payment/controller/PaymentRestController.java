@@ -59,4 +59,14 @@ public class PaymentRestController {
     public Payment getPaymentByBookingId(@PathVariable Long bookingId) {
         return paymentService.getPaymentByBookingId(bookingId);
     }
+
+    @PostMapping("/booking/{bookingId}/cancel")
+    public Payment cancelPayment(@PathVariable Long bookingId) {
+        return paymentService.cancelPayment(bookingId);
+    }
+
+    @GetMapping("/user/{userId}")
+    public List<Payment> getPaymentsByUser(@PathVariable Long userId) {
+        return paymentService.getPaymentsByUserId(userId);
+    }
 }

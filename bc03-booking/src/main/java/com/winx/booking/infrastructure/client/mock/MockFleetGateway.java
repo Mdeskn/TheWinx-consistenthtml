@@ -14,7 +14,7 @@ public class MockFleetGateway implements FleetGateway {
 
     private VehicleDto sample(Long id, String status) {
         return new VehicleDto(id, null, "E_SCOOTER", "Sample e-scooter " + id, status,
-                new BigDecimal("0.20"), "PER_HOUR", 18);
+                new BigDecimal("0.20"), "PER_HOUR", 18, 1);
     }
 
     @Override
@@ -23,7 +23,7 @@ public class MockFleetGateway implements FleetGateway {
     }
 
     @Override
-    public List<VehicleDto> search(double lat, double lon, double radiusKm, String type, BigDecimal maxPrice) {
+    public List<VehicleDto> search(double lat, double lon, double radiusKm, String type, BigDecimal maxPrice, Integer minPersons) {
         return List.of(sample(1L, "AVAILABLE"), sample(2L, "AVAILABLE"));
     }
 

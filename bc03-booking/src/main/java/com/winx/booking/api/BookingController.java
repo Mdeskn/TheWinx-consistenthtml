@@ -66,7 +66,8 @@ public class BookingController {
                                            @RequestParam double lon,
                                            @RequestParam(defaultValue = "2.0") double radiusKm,
                                            @RequestParam(required = false) String type,
-                                           @RequestParam(required = false) BigDecimal maxPrice) {
-        return service.searchVehicles(lat, lon, radiusKm, type, maxPrice);
+                                           @RequestParam(required = false) BigDecimal maxPrice,
+                                           @RequestParam(required = false) Integer minPersons) {
+        return service.searchVehicles(lat, lon, radiusKm, type, maxPrice, minPersons);
     }
 }

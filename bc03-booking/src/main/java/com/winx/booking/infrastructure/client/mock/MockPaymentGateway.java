@@ -16,4 +16,9 @@ public class MockPaymentGateway implements PaymentGateway {
         log.info("[mock] Payment authorized for booking {} amount {} {}",
                 request.bookingId(), request.amount(), request.currency());
     }
+
+    @Override
+    public void cancelPayment(Long bookingId) {
+        log.info("[mock] Payment cancellation recorded for booking {}", bookingId);
+    }
 }

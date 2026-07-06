@@ -9,7 +9,7 @@ public interface FleetGateway {
 
     VehicleDto findVehicle(Long id);
 
-    List<VehicleDto> search(double lat, double lon, double radiusKm, String type, BigDecimal maxPrice);
+    List<VehicleDto> search(double lat, double lon, double radiusKm, String type, BigDecimal maxPrice, Integer minPersons);
 
     void markBooked(Long vehicleId);
 

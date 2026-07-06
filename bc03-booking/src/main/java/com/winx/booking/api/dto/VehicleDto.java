@@ -13,6 +13,7 @@ public record VehicleDto(
         String status,
         BigDecimal pricePerUnit,
         String billingModel,
-        Integer minAge
+        Integer minAge,
+        Integer maxPersons
 ) {
 }

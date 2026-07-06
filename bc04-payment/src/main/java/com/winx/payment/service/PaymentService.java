@@ -70,4 +70,16 @@ public class PaymentService {
                 .orElseThrow(() -> new RuntimeException("Payment not found for booking"));
     }
 
+    public Payment cancelPayment(Long bookingId) {
+        Payment payment = paymentRepository.findByBookingId(bookingId)
+                .orElseThrow(() -> new RuntimeException("No payment found for booking " + bookingId));
+        payment.markAsRefunded();
+        return paymentRepository.save(payment);
+    }
+
+    public List<Payment> getPaymentsByUserId(Long userId) {
+        return paymentRepository.findAll().stream()
+                .filter(p -> userId.equals(p.getUserId()))
+                .toList();
+    }
 }

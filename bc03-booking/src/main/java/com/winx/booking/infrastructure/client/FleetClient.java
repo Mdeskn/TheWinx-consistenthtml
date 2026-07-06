@@ -23,7 +23,8 @@ public interface FleetClient {
                             @RequestParam("lon") double lon,
                             @RequestParam("radiusKm") double radiusKm,
                             @RequestParam(value = "type", required = false) String type,
-                            @RequestParam(value = "maxPrice", required = false) BigDecimal maxPrice);
+                            @RequestParam(value = "maxPrice", required = false) BigDecimal maxPrice,
+                            @RequestParam(value = "minPersons", required = false) Integer minPersons);
 
     @PatchMapping("/{id}/status")
     VehicleDto updateStatus(@PathVariable("id") Long id, @RequestBody StatusUpdate update);
